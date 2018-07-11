@@ -1,5 +1,8 @@
 {
     "Supervisor" :{
         "port":3000
+    },
+    "Frontend" :{
+        "port":4000
     }
   }

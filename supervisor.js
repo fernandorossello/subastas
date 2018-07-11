@@ -24,6 +24,14 @@ app.put('/process', (req, res) =>{
 app.listen(port, () => console.log('Supervisor online on port '+ port));
 
 function createProcess(port) {
-        console.log('Instantiating process on port '+ port);
+        console.log('Starting process on port '+ port);
         exec('node process.js ' + port);
 }
+
+function init() {
+    frontendPort = config.Frontend.port;
+    console.log('Starting frontend on port '+ frontendPort);
+    exec('node frontend.js ' + frontendPort);
+}
+
+init();
