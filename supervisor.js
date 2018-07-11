@@ -1,15 +1,29 @@
 const express = require('express');
-const config = require('./config.json');
+const { exec } = require('child_process');
 
+const config = require('./config.json');
 const app = express();
 const port = config.Supervisor.port;
 
 app.use(express.json() );
 app.use(express.urlencoded({ extended: true }));
 
-
 app.get('/ping', (req, res) => res.send('pong!'));
 
+app.put('/process', (req, res) =>{
+    console.log(req.body);
+    try {
+        createProcess(req.body.port);
+        res.send("Porcess created on port "+ req.body.port);
+    } catch(error) {
+        res.statusCode = 502;
+        res.send(error)
+    }
+});
 
+app.listen(port, () => console.log('Supervisor online on port '+ port));
 
-app.listen(port, () => console.log('Market listening on port '+ port));
+function createProcess(port) {
+        console.log('Instantiating process on port '+ port);
+        exec('node process.js ' + port);
+}
