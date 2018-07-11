@@ -1,0 +1,27 @@
+{
+  "name": "subastas",
+  "version": "1.0.0",
+  "description": "TP para materia IASC",
+  "main": "index.js",
+  "scripts": {
+    "test": "test",
+    "start": "node supervisor.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fernandorossello/subastas.git"
+  },
+  "keywords": [
+    "iasc",
+    "subastas"
+  ],
+  "author": "frossello",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fernandorossello/subastas/issues"
+  },
+  "homepage": "https://github.com/fernandorossello/subastas#readme",
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}
