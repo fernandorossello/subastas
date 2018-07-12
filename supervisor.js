@@ -21,8 +21,10 @@ app.get('/ping', (req, res) => res.send('pong!'));
 app.put('/process', (req, res) => {
     console.log(req.body);
     try {
-        var process = new ProcessData(req.body.port)
+        var process = new ProcessData("http://"+"localhost",req.body.port);
+
         startProcess(process.port);
+        startProcess(process.replic);
         processes.push(process);
         axios.post('http://127.0.0.1:'+frontendPort+'/process',process)
         .then(response => {

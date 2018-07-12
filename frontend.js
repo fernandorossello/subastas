@@ -34,6 +34,21 @@ app.get('/process-list', (req, res) => {
     }
 });
 
+app.get('/ping-to-process', (req, res) => {
+    try {
+        const server = getProcess();
+        res.redirect(307,server.address+":"+server.port+"/ping");  
+    } catch(error) {
+        res.statusCode = 502;
+        res.send(error.message)
+    }
+});
+
+app.get('/status', (req, res) => {
+    const promises = processes.map( server => axios.get(server.address+":"+server.port+"/ping"));
+    Promise.all(promises).then(results => res.json(results.map(el => el.headers["x-server-name"]+':'+el.statusText)) );
+});
+
 app.listen(port, () => console.log('Frontend online on port '+ port));
 
 function init(){
@@ -50,5 +65,8 @@ function loadProcessData(){
         });
 }
 
+function getProcess(){
+    return processes[Math.floor(processes.length * Math.random())];
+}
 
 init();
