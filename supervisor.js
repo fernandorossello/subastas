@@ -22,7 +22,7 @@ app.put('/process', (req, res) => {
     console.log(req.body);
     try {
         var process = new ProcessData(req.body.port)
-        createProcess(process.port);
+        startProcess(process.port);
         processes.push(process);
         axios.post('http://127.0.0.1:'+frontendPort+'/process',process)
         .then(response => {
@@ -49,7 +49,7 @@ app.get('/process-list', (req, res) =>{
 
 app.listen(port, () => console.log('Supervisor online on port '+ port));
 
-function createProcess(port) {
+function startProcess(port) {
         console.log('Starting process on port '+ port);
         exec('node process.js ' + port);
 }
@@ -69,24 +69,43 @@ function init() {
 function keepAlive(){
     var ports = [frontendPort]
     
+    keepAliveFrontend();
+    keepAliveProcesses();
+
+    setTimeout(keepAlive, 1500);
+}
+
+// Mantiene levantado el frontend
+function keepAliveFrontend(){
     ping(frontendPort)
     .catch( error =>{
         console.log(error.message);
         startFrontend(true);
     });
+}
 
-    setTimeout(keepAlive, 1500);
+// Mantiene levantados los procesos que manejan las subastas
+function keepAliveProcesses(){
+    processes.forEach(process => {
+        ping(process.port)
+        .catch( error =>{
+            console.log(error.message);
+            startProcess(process.port);
+        });
+    })
 }
 
 function ping (port) {
-    return axios.get('http://127.0.0.1:'+frontendPort+'/ping',process);
+    return axios.get('http://127.0.0.1:'+port+'/ping',process);
 }
 
+// Inicia el proceso de frontend.
 function startFrontend(restart){
     console.log('Starting frontend on port '+ frontendPort);
     exec('node frontend.js ' + frontendPort + ' ' + restart);
 }
 
+// Permite obtener la información de los procesos que están corriendo, pidiendosela al frontend.
 function loadProcessData(){
     console.log('Obtaining data after shutdown');
     axios.get('http://localhost:'+ config.Frontend.port+'/process-list')
