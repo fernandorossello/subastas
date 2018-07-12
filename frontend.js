@@ -1,12 +1,13 @@
 const express = require('express');
 const axios = require('axios');
 const config = require('./config.json');
+const axiosRetry = require('axios-retry');
 
 const app = express();
 const port = process.argv[2];
 const restart = process.argv[3] ? process.argv[3] : false;
 
-console.log('Restart value: '+ restart);
+axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 
 var processes = [];
 
@@ -35,13 +36,17 @@ app.get('/process-list', (req, res) => {
 });
 
 app.get('/ping-to-process', (req, res) => {
-    try {
-        const server = getProcess();
-        res.redirect(307,server.address+":"+server.port+"/ping");  
-    } catch(error) {
-        res.statusCode = 502;
-        res.send(error.message)
-    }
+        const process = getProcess();
+
+        axios.get(process.address+":"+process.port+"/ping")
+        .then(response =>{
+            res.status = response.status;
+            res.send(response.data);
+        })
+        .catch(error => {
+            res.status = response.status;
+            res.send(error.message);
+        });
 });
 
 app.get('/status', (req, res) => {
@@ -51,7 +56,7 @@ app.get('/status', (req, res) => {
 
 app.listen(port, () => console.log('Frontend online on port '+ port));
 
-function init(){
+function init() {
     if(restart){
         loadProcessData();
     }

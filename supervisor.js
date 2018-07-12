@@ -11,6 +11,8 @@ const frontendPort = config.Frontend.port;
 
 const restart = process.argv[2] ? process.argv[2] : false;
 
+const supervisionTime = 2000
+
 var processes = [];
 
 app.use(express.json());
@@ -57,7 +59,6 @@ function startProcess(port) {
 }
 
 function init() {
-
     if(restart){
         loadProcessData();
     } else {
@@ -65,7 +66,7 @@ function init() {
     }
     
     // Supervisión de los procesos para levantarlos en caso de caídas
-    setTimeout(keepAlive, 1500);
+    setTimeout(keepAlive, supervisionTime);
 }
 
 function keepAlive(){
@@ -74,7 +75,7 @@ function keepAlive(){
     keepAliveFrontend();
     keepAliveProcesses();
 
-    setTimeout(keepAlive, 1500);
+    setTimeout(keepAlive, supervisionTime);
 }
 
 // Mantiene levantado el frontend

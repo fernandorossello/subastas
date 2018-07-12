@@ -23,6 +23,7 @@
   "homepage": "https://github.com/fernandorossello/subastas#readme",
   "dependencies": {
     "axios": "^0.18.0",
+    "axios-retry": "^3.1.1",
     "child_process": "^1.0.2",
     "express": "^4.16.3"
   }
