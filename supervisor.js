@@ -52,10 +52,35 @@ function createProcess(port) {
         exec('node process.js ' + port);
 }
 
-
 function init() {
-    console.log('Starting frontend on port '+ frontendPort);
-    exec('node frontend.js ' + frontendPort);
+    startFrontend();
+    
+    // Supervisión de los procesos para levantarlos en caso de caídas
+    setTimeout(keepAlive, 1500);
 }
 
+function keepAlive(){
+    var ports = [frontendPort]
+    
+    ping(frontendPort)
+    .catch( error =>{
+        console.log(error.message);
+        startFrontend(true);
+    });
+
+    setTimeout(keepAlive, 1500);
+}
+
+function ping (port) {
+    return axios.get('http://127.0.0.1:'+frontendPort+'/ping',process);
+}
+
+function startFrontend(restart){
+    console.log('Starting frontend on port '+ frontendPort);
+    exec('node frontend.js ' + frontendPort + ' ' + restart);
+}
+
+
 init();
+
+

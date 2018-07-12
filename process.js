@@ -4,7 +4,7 @@ const config = require('./config.json');
 const app = express();
 const port = process.argv[2];
 
-app.use(express.json() );
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/ping', (req, res) => res.send('pong!'));
