@@ -9,6 +9,8 @@ const app = express();
 const port = config.Supervisor.port;
 const frontendPort = config.Frontend.port;
 
+const restart = process.argv[2] ? process.argv[2] : false;
+
 var processes = [];
 
 app.use(express.json());
@@ -53,7 +55,12 @@ function createProcess(port) {
 }
 
 function init() {
-    startFrontend();
+
+    if(restart){
+        loadProcessData();
+    } else {
+        startFrontend();
+    }
     
     // Supervisión de los procesos para levantarlos en caso de caídas
     setTimeout(keepAlive, 1500);
@@ -80,6 +87,13 @@ function startFrontend(restart){
     exec('node frontend.js ' + frontendPort + ' ' + restart);
 }
 
+function loadProcessData(){
+    console.log('Obtaining data after shutdown');
+    axios.get('http://localhost:'+ config.Frontend.port+'/process-list')
+        .then(res => {
+            processes = res.data;
+        });
+}
 
 init();
 
