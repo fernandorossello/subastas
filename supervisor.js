@@ -28,7 +28,8 @@ app.put('/process', (req, res) => {
         startProcess(process.port);
         startProcess(process.replic);
         processes.push(process);
-        axios.post('http://127.0.0.1:'+frontendPort+'/process',process)
+       
+        axios.post('http://127.0.0.1:'+frontendPort+'/process', process)
         .then(response => {
             res.send("Porcess created on port "+ process.port);
         })
@@ -99,7 +100,7 @@ function keepAliveProcesses(){
 }
 
 function ping (port) {
-    return axios.get('http://127.0.0.1:'+port+'/ping',process);
+    return axios.get('http://127.0.0.1:'+port+'/ping');
 }
 
 // Inicia el proceso de frontend.

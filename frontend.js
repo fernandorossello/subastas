@@ -36,7 +36,7 @@ app.get('/process-list', (req, res) => {
 });
 
 app.get('/ping-to-process', (req, res) => {
-        const process = getProcess();
+        const process = getProcessRandomly();
 
         axios.get(process.address+":"+process.port+"/ping")
         .then(response =>{
@@ -70,7 +70,31 @@ function loadProcessData(){
         });
 }
 
-function getProcess(){
+app.post('/buyers',(req, res) => {
+        var process = getProcessRandomly();
+        var buyer = req.body
+        addBuyer(process,buyer)
+        .then(response=>{
+            res.send(response.data);
+            processes
+                .filter(p => p.port != process.port) //TODO: Reemplazar comparación por ID
+                .forEach(p => { 
+                    addBuyer(p,buyer) });
+            
+        })
+        .catch(error => {
+            res.status = 502;
+            res.send(error.message);
+        })
+  });
+
+// Genera un post al proceso dado para cargar un comprador
+function addBuyer(process,buyer){
+    return axios.post(process.address+":"+process.port+"/buyers",buyer);    
+}
+
+// Devuelve un proceso cualquiera de la lista de procesos levantados
+function getProcessRandomly(){
     return processes[Math.floor(processes.length * Math.random())];
 }
 
