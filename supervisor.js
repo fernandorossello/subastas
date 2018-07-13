@@ -36,7 +36,7 @@ app.put('/process', (req, res) => {
         .catch(error=> {
             res.statusCode = 502;
             res.send(error.message)
-        });        
+        });
     } catch(error) {
         res.statusCode = 502;
         res.send(error.message)
@@ -55,8 +55,16 @@ app.get('/process-list', (req, res) =>{
 app.listen(port, () => console.log('Supervisor online on port '+ port));
 
 function startProcess(port) {
-        console.log('Starting process on port '+ port);
-        exec('node process.js ' + port);
+       console.log('Starting process on port '+ port);
+       
+       const child = exec('node process.js ' + port);
+        child.stdout.on('data', (data) => {
+            console.log(`[process ${port} stdout]: ${data}`);
+        });
+          
+        child.stderr.on('data', (data) => {
+            console.error(`[process ${port} stderr]:\n${data}`);
+        });
 }
 
 function init() {
@@ -106,7 +114,17 @@ function ping (port) {
 // Inicia el proceso de frontend.
 function startFrontend(restart){
     console.log('Starting frontend on port '+ frontendPort);
-    exec('node frontend.js ' + frontendPort + ' ' + restart);
+    
+    const child = exec('node frontend.js ' + frontendPort + ' ' + restart);
+    
+    child.stdout.on('data', (data) => {
+        console.log(`[frontend stdout]: ${data}`);
+    });
+      
+    child.stderr.on('data', (data) => {
+        console.error(`[frontend stderr]:${data}`);
+    });
+    
 }
 
 // Permite obtener la información de los procesos que están corriendo, pidiendosela al frontend.
