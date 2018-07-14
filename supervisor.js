@@ -2,7 +2,7 @@ const express = require('express');
 const { exec } = require('child_process');
 const axios = require('axios');
 
-const ProcessData = require('./process-data');
+const ProcessData = require('./model/process-data');
 
 const config = require('./config.json');
 const app = express();
@@ -63,10 +63,10 @@ function startProcess(process) {
            console.error(`[process ${process.port} stderr]:\n${data}`);
        });
 
-       startReplic(process.replica);
+       startReplica(process.replica);
 }
 
-function startReplic(port){
+function startReplica(port){
     const child = exec('node replica.js ' + port);
     child.stdout.on('data', (data) => {
         console.log(`[replica ${port} stdout]: ${data}`);
@@ -113,6 +113,12 @@ function keepAliveProcesses(){
         .catch( error =>{
             console.log(error.message);
             startProcess(process.port);
+        });
+
+        ping(process.replica)
+        .catch( error =>{
+            console.log(error.message);
+            startReplica(process.replica);
         });
     })
 }

@@ -14,6 +14,36 @@ var processes = [];
 app.use(express.json() );
 app.use(express.urlencoded({ extended: true }));
 
+
+function init() {
+    if(restart){
+        loadProcessData();
+    }
+}
+
+function loadProcessData(){
+    console.log('Obtaining data after shutdown');
+    axios.get('http://localhost:'+ config.Supervisor.port+'/process-list')
+        .then(res => {
+            processes = res.data;
+        });
+}
+
+// Genera un post al proceso dado para cargar un comprador
+function addBuyer(process,buyer){
+    return axios.post(process.address+":"+process.port+"/buyers",buyer);    
+}
+
+// Devuelve un proceso cualquiera de la lista de procesos levantados
+function getProcessRandomly() {
+    return processes[Math.floor(processes.length * Math.random())];
+}
+
+init();
+
+app.listen(port, () => console.log('Frontend online on port '+ port));
+
+//INTERFAZ
 app.get('/ping', (req, res) => res.send('pong!'));
 
 app.post('/process', (req, res) => {
@@ -54,48 +84,33 @@ app.get('/status', (req, res) => {
     Promise.all(promises).then(results => res.json(results.map(el => el.headers["x-server-name"]+':'+el.statusText)) );
 });
 
-app.listen(port, () => console.log('Frontend online on port '+ port));
-
-function init() {
-    if(restart){
-        loadProcessData();
-    }
-}
-
-function loadProcessData(){
-    console.log('Obtaining data after shutdown');
-    axios.get('http://localhost:'+ config.Supervisor.port+'/process-list')
-        .then(res => {
-            processes = res.data;
-        });
-}
-
 app.post('/buyers',(req, res) => {
-        var process = getProcessRandomly();
-        var buyer = req.body
-        addBuyer(process,buyer)
-        .then(response=>{
-            res.send(response.data);
-            processes
-                .filter(p => p.port != process.port) //TODO: Reemplazar comparación por ID
-                .forEach(p => { 
-                    addBuyer(p,buyer) });
-            
-        })
-        .catch(error => {
-            res.status = 502;
-            res.send(error.message);
-        })
-  });
+    var process = getProcessRandomly();
+    var buyer = req.body
+    addBuyer(process,buyer)
+    .then(response=>{
+        res.send(response.data);
+        processes
+            .filter(p => p.port != process.port) //TODO: Reemplazar comparación por ID
+            .forEach(p => { 
+                addBuyer(p,buyer) });
+        
+    })
+    .catch(error => {
+        res.status = 502;
+        res.send(error.message);
+    })
+});
 
-// Genera un post al proceso dado para cargar un comprador
-function addBuyer(process,buyer){
-    return axios.post(process.address+":"+process.port+"/buyers",buyer);    
-}
-
-// Devuelve un proceso cualquiera de la lista de procesos levantados
-function getProcessRandomly(){
-    return processes[Math.floor(processes.length * Math.random())];
-}
-
-init();
+app.post('/bids',(req, res) => {
+    var process = getProcessRandomly();
+    var bid = req.body;
+    axios.post(process.address+":"+process.port+"/bids", bid)
+    .then(response=>{
+        res.send(response.data);
+    })
+    .catch(error => {
+        res.status = 502;
+        res.send(error.message);
+    })    
+});

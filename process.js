@@ -1,11 +1,20 @@
 const express = require('express');
 const app = express();
 
+const axios = require('axios');
+const axiosRetry = require('axios-retry');
+axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
+
+const Bid = require('./model/bid');
+
 const port = process.argv[2];
-const replicPort = process.argv[3];
+const replicaPort = process.argv[3];
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+const Memory = require('./memory.js')
+var memory = new Memory();
 
 var buyers = [];
 
@@ -34,5 +43,21 @@ app.get('/buyers-list',(req, res) => {
 
 app.get('/ping', (req, res) => res.send('pong!'));
 
-app.post('/bids')
+app.post('/bids',(req, res) => {
+  try{
+    var bid = Object.setPrototypeOf(req.body, Bid.prototype);
+    memory.addBid(bid);
+    replicate()
+    .then(() => {
+      res.send("Bid added!");
+    });
+  } catch(error) {
+    res.status = 502;
+    res.send(error.message);
+  }
+});
+
+function replicate(bid) {
+  return axios.post("http://localhost:"+ replicaPort +"/set", memory);
+}
 
