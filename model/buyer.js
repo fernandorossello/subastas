@@ -6,6 +6,10 @@ class Buyer {
         this.tags = tags;
     }
 
+    url(){
+        return this.address + ':' + this.port;
+    }
+
     isInterested(tags){
         return this.tags.some(r=> tags.includes(r))
     }

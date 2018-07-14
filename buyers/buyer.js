@@ -13,9 +13,11 @@ app.use(express.urlencoded({ extended: true }));
 
 marketPort = config.Frontend.port;
 const port = process.argv[2];
-const tags = process.argv[3];
+const tags = process.argv[3].split(',')
 
-function init(){
+const bids = []
+
+function init() {
     suscribe();
 }
 
@@ -35,8 +37,15 @@ init();
 app.listen(port, () => console.log('Process online on port '+ port));
 
 //INTERFAZ
-app.post('/inbox', (req, res) => {        
-    console.log(app.name + ": "+JSON.stringify(req.body));//
-    res.send('ok');
+app.put('/bids', (req, res) => {
+    try{        
+        console.log('New bid!')
+        var bid = Object.setPrototypeOf(req.body, Bid.prototype);
+        bids.push(bid);
+        res.send();
+    } catch(error) {
+        res.status = 502;
+        res.send(error.message);
+    }
 });
 

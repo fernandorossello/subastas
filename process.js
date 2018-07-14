@@ -28,9 +28,20 @@ function replicate() {
   return axios.post("http://localhost:"+ replicaPort +"/memory", memory);
 }
 
+function notifyNewBid(bid){
+      buyers
+        .filter(b => b.isInterested(bid.tags))
+        .forEach(b => {
+          axios.put(b.url()+'/bids',bid)
+        });
+}
+
+
 app.listen(port, () => console.log('Process online on port '+ port));
 
 //INTERFAZ
+app.get('/ping', (req, res) => res.send('pong!'));
+
 app.post('/buyers',(req, res) => {
   try{
     buyer = Object.setPrototypeOf(req.body, Buyer.prototype);
@@ -46,8 +57,6 @@ app.get('/buyers',(req, res) => {
     res.send(buyers);
 });
 
-app.get('/ping', (req, res) => res.send('pong!'));
-
 app.post('/bids',(req, res) => {
   try{
     var bid = Object.setPrototypeOf(req.body, Bid.prototype);
@@ -55,6 +64,7 @@ app.post('/bids',(req, res) => {
     replicate()
     .then(() => {
       res.send("Bid added!");
+      notifyNewBid(bid);
     });
   } catch(error) {
     res.status = 502;
