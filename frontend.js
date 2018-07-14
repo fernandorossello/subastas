@@ -2,13 +2,17 @@ const express = require('express');
 const axios = require('axios');
 const config = require('./config.json');
 const axiosRetry = require('axios-retry');
+axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
+
+const Bid = require('./model/bid');
 
 const app = express();
+
 const port = process.argv[2];
 const restart = Boolean(process.argv[3]) || false;
 
-axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
-
+const UniqueIDGenerator = require('./helpers/uniqueID')
+const uniqueIDGenerator = new UniqueIDGenerator();
 var processes = [];
 
 app.use(express.json() );
@@ -103,7 +107,8 @@ app.post('/buyers',(req, res) => {
 
 app.post('/bids',(req, res) => {
     var process = getProcessRandomly();
-    var bid = req.body;
+    var bid = Object.setPrototypeOf(req.body, Bid.prototype);
+    bid.id = process.id +'-'+ uniqueIDGenerator.getUID();
     axios.post(process.address+":"+process.port+"/bids", bid)
     .then(response=>{
         res.send(response.data);
@@ -112,4 +117,8 @@ app.post('/bids',(req, res) => {
         res.status = 502;
         res.send(error.message);
     })    
+});
+
+app.post('/bids/:id',(req, res) => {
+
 });
