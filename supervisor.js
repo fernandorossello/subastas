@@ -9,8 +9,7 @@ const app = express();
 const port = config.Supervisor.port;
 const frontendPort = config.Frontend.port;
 
-const restart = process.argv[2] ? process.argv[2] : false;
-
+const restart  = Boolean(process.argv[2]) || false;
 const supervisionTime = 2000
 
 var processes = [];
@@ -71,16 +70,16 @@ function init() {
     if(restart){
         loadProcessData();
     } else {
-        startFrontend();
+        startFrontend(false);
     }
     
     // Supervisión de los procesos para levantarlos en caso de caídas
     setTimeout(keepAlive, supervisionTime);
 }
 
+// Función para mantener vivos todos los procesos supervisados
 function keepAlive(){
-    var ports = [frontendPort]
-    
+   
     keepAliveFrontend();
     keepAliveProcesses();
 
@@ -107,6 +106,7 @@ function keepAliveProcesses(){
     })
 }
 
+// Genera una promise de un get de ping a un puerto determinado
 function ping (port) {
     return axios.get('http://127.0.0.1:'+port+'/ping');
 }
@@ -115,7 +115,12 @@ function ping (port) {
 function startFrontend(restart){
     console.log('Starting frontend on port '+ frontendPort);
     
-    const child = exec('node frontend.js ' + frontendPort + ' ' + restart);
+    var command = 'node frontend.js ' + frontendPort
+    if (restart){
+        command += ' ' + true
+    }
+
+    const child = exec(command);
     
     child.stdout.on('data', (data) => {
         console.log(`[frontend stdout]: ${data}`);
@@ -127,7 +132,7 @@ function startFrontend(restart){
     
 }
 
-// Permite obtener la información de los procesos que están corriendo, pidiendosela al frontend.
+// Permite obtener la información de los procesos que están corriendo, pidiéndosela al frontend.
 function loadProcessData(){
     console.log('Obtaining data after shutdown');
     axios.get('http://localhost:'+ config.Frontend.port+'/process-list')

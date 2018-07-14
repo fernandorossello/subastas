@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "test",
-    "start": "node supervisor.js"
+    "start": "node supervisor.js",
+    "restart":"node supervisor.js true"
   },
   "repository": {
     "type": "git",

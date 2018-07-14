@@ -5,7 +5,7 @@ const axiosRetry = require('axios-retry');
 
 const app = express();
 const port = process.argv[2];
-const restart = process.argv[3] ? process.argv[3] : false;
+const restart = Boolean(process.argv[3]) || false;
 
 axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 
