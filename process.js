@@ -23,6 +23,9 @@ app.use(function(req, res, next) {
     next();
   });
 
+function replicate() {
+  return axios.post("http://localhost:"+ replicaPort +"/memory", memory);
+}
 
 app.listen(port, () => console.log('Process online on port '+ port));
 
@@ -57,7 +60,14 @@ app.post('/bids',(req, res) => {
   }
 });
 
-function replicate(bid) {
-  return axios.post("http://localhost:"+ replicaPort +"/set", memory);
-}
+app.get('/memory',(req, res) => {
+  res.send(memory);
+});
+
+app.post('/memory',(req,res) => {
+  var mem = req.body;
+  memory = Object.setPrototypeOf(req.body, Memory.prototype);
+  res.send();
+})
+
 

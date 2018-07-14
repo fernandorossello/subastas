@@ -13,12 +13,12 @@ app.listen(port, () => console.log('Replica online on port '+ port));
 //INTERFAZ
 app.get('/ping', (req, res) => res.send('pong!'));
 
-app.post('/set',(req,res) => {
+app.post('/memory',(req,res) => {
     var mem = req.body;
     memory = mem;
     res.send();
 })
 
-app.get('/get',(req, res) => {
+app.get('/memory',(req, res) => {
     res.send(memory);
 });

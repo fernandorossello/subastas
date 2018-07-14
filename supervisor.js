@@ -1,6 +1,9 @@
 const express = require('express');
 const { exec } = require('child_process');
 const axios = require('axios');
+const axiosRetry = require('axios-retry');
+
+axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 
 const ProcessData = require('./model/process-data');
 
@@ -20,24 +23,22 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/ping', (req, res) => res.send('pong!'));
 
 app.put('/process', (req, res) => {
-    try {
         var process = new ProcessData(req.body.address,req.body.port);
-
-        startProcess(process);
-        processes.push(process);
-       
-        axios.post('http://127.0.0.1:'+frontendPort+'/process', process)
-        .then(response => {
-            res.send("Porcess created on port "+ process.port);
-        })
-        .catch(error=> {
-            res.statusCode = 502;
-            res.send(error.message)
-        });
-    } catch(error) {
-        res.statusCode = 502;
-        res.send(error.message)
-    }
+        startProcess(process)
+            .then(() => {
+                startReplica(process);
+            })
+            .then(() => {
+                axios.post('http://127.0.0.1:'+frontendPort+'/process', process)
+            })
+            .then(() => {
+                processes.push(process);
+                res.send("Porcess created on port "+ process.port);
+            })
+            .catch(error=> {
+                res.statusCode = 502;
+                res.send(error.message)
+            }); 
 });
 
 app.get('/process-list', (req, res) =>{
@@ -52,29 +53,91 @@ app.get('/process-list', (req, res) =>{
 app.listen(port, () => console.log('Supervisor online on port '+ port));
 
 function startProcess(process) {
-       console.log('Starting process on port '+ process.port);
-       
-       const child = exec('node process.js ' + process.port + ' ' + process.replica);
-       child.stdout.on('data', (data) => {
-           console.log(`[process ${process.port} stdout]: ${data}`);
-       });
-         
-       child.stderr.on('data', (data) => {
-           console.error(`[process ${process.port} stderr]:\n${data}`);
-       });
+    return new Promise(function(resolve, reject) { 
+        try{      
+            const child = exec('node process.js ' + process.port + ' ' + process.replica);
+            child.stdout.on('data', (data) => {
+                console.log(`[process ${process.port} stdout]: ${data}`);
+            });
+            
+            child.stderr.on('data', (data) => {
+                console.error(`[process ${process.port} stderr]:\n${data}`);
+            });
 
-       startReplica(process.replica);
+            ping(process.port)
+                .then(()=>{
+                    resolve();
+                });            
+        } catch(error) {
+            reject(error.message);
+        }});
+       
 }
 
-function startReplica(port){
-    const child = exec('node replica.js ' + port);
-    child.stdout.on('data', (data) => {
-        console.log(`[replica ${port} stdout]: ${data}`);
-    });
-      
-    child.stderr.on('data', (data) => {
-        console.error(`[replica ${port} stderr]:\n${data}`);
-    });
+function startReplica(process){
+    return new Promise(function(resolve, reject) { 
+        try{
+            const child = exec('node replica.js ' + process.replica);
+            child.stdout.on('data', (data) => {
+                console.log(`[replica ${process.replica} stdout]: ${data}`);
+            });
+            
+            child.stderr.on('data', (data) => {
+                console.error(`[replica ${process.replica} stderr]:\n${data}`);
+            });
+
+            ping(process.replica)
+                .then(()=>{
+                    resolve();
+                });  
+
+        } catch(error) {
+            reject(error.message);
+        }});
+}
+
+function restartProcess(process){
+    //Levanta el proceso
+    //Obtener los datos para replicar
+    //Setea la memoria
+    startProcess(process)
+        .then(res =>{
+            return getMemory(process.address,process.replica)
+        })
+        .then(res =>{
+            setMemory(process.address,process.port,res.data);
+        })
+        .catch(error=> {
+            console.log(error.message);
+        });
+
+}
+
+function restartReplica(process){
+    //Levanta la réplica
+    //Obtener los datos para replicar
+    //Setea la memoria
+    startReplica(process)
+        .then(res =>{
+           return getMemory(process.address,process.port)
+        })
+        .then(res =>{
+            setMemory(process.address,process.replica,res.data);
+        })
+        .catch(error=> {
+            console.log(error.message);
+        });
+
+}
+
+// Devuelve una promise con la memoria para restaurar una replica o un proceso
+function getMemory(address,port){
+    return axios.get(address+':'+port+'/memory');
+}
+
+// Devuelve una promise con la respuesta de setearle la memoria a un proceso o replica
+function setMemory(address,port,memory){
+    return axios.post(address+':'+port+'/memory',memory);
 }
 
 function init() {
@@ -112,13 +175,13 @@ function keepAliveProcesses(){
         ping(process.port)
         .catch( error =>{
             console.log(error.message);
-            startProcess(process.port);
+            restartProcess(process);
         });
 
         ping(process.replica)
         .catch( error =>{
             console.log(error.message);
-            startReplica(process.replica);
+            restartReplica(process);
         });
     })
 }
