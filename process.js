@@ -1,8 +1,8 @@
 const express = require('express');
-const config = require('./config.json');
-
 const app = express();
+
 const port = process.argv[2];
+const replicPort = process.argv[3];
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -14,21 +14,25 @@ app.use(function(req, res, next) {
     next();
   });
 
-  app.post('/buyers',(req, res) => {
-    try{
-      buyers.push(req.body);
-      res.send('Buyer created!')
-    } catch(error) {
-      res.status = 502;
-      res.send(error.message);
-    }
-  });
-
-  app.get('/buyers-list',(req, res) => {
-      res.send(buyers);
-  });
-
-  
-app.get('/ping', (req, res) => res.send('pong!'));
 
 app.listen(port, () => console.log('Process online on port '+ port));
+
+//INTERFAZ
+app.post('/buyers',(req, res) => {
+  try{
+    buyers.push(req.body);
+    res.send('Buyer created!')
+  } catch(error) {
+    res.status = 502;
+    res.send(error.message);
+  }
+});
+
+app.get('/buyers-list',(req, res) => {
+    res.send(buyers);
+});
+
+app.get('/ping', (req, res) => res.send('pong!'));
+
+app.post('/bids')
+

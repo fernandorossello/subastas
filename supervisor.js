@@ -20,12 +20,10 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/ping', (req, res) => res.send('pong!'));
 
 app.put('/process', (req, res) => {
-    console.log(req.body);
     try {
-        var process = new ProcessData("http://"+"localhost",req.body.port);
+        var process = new ProcessData(req.body.address,req.body.port);
 
-        startProcess(process.port);
-        startProcess(process.replic);
+        startProcess(process);
         processes.push(process);
        
         axios.post('http://127.0.0.1:'+frontendPort+'/process', process)
@@ -53,17 +51,30 @@ app.get('/process-list', (req, res) =>{
 
 app.listen(port, () => console.log('Supervisor online on port '+ port));
 
-function startProcess(port) {
-       console.log('Starting process on port '+ port);
+function startProcess(process) {
+       console.log('Starting process on port '+ process.port);
        
-       const child = exec('node process.js ' + port);
-        child.stdout.on('data', (data) => {
-            console.log(`[process ${port} stdout]: ${data}`);
-        });
-          
-        child.stderr.on('data', (data) => {
-            console.error(`[process ${port} stderr]:\n${data}`);
-        });
+       const child = exec('node process.js ' + process.port + ' ' + process.replica);
+       child.stdout.on('data', (data) => {
+           console.log(`[process ${process.port} stdout]: ${data}`);
+       });
+         
+       child.stderr.on('data', (data) => {
+           console.error(`[process ${process.port} stderr]:\n${data}`);
+       });
+
+       startReplic(process.replica);
+}
+
+function startReplic(port){
+    const child = exec('node replica.js ' + port);
+    child.stdout.on('data', (data) => {
+        console.log(`[replica ${port} stdout]: ${data}`);
+    });
+      
+    child.stderr.on('data', (data) => {
+        console.error(`[replica ${port} stderr]:\n${data}`);
+    });
 }
 
 function init() {
