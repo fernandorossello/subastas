@@ -33,7 +33,7 @@ app.put('/process', (req, res) => {
             })
             .then(() => {
                 processes.push(process);
-                res.send("Porcess created on port "+ process.port);
+                res.send("Process listening on port "+ process.port);
             })
             .catch(error=> {
                 res.statusCode = 502;
@@ -193,23 +193,20 @@ function ping (port) {
 
 // Inicia el proceso de frontend.
 function startFrontend(restart){
-    console.log('Starting frontend on port '+ frontendPort);
-    
-    var command = 'node frontend.js ' + frontendPort
-    if (restart){
-        command += ' ' + true
-    }
+            var command = 'node frontend.js ' + frontendPort
+            if (restart){
+                command += ' ' + true
+            }
 
-    const child = exec(command);
-    
-    child.stdout.on('data', (data) => {
-        console.log(`[frontend stdout]: ${data}`);
-    });
-      
-    child.stderr.on('data', (data) => {
-        console.error(`[frontend stderr]:${data}`);
-    });
-    
+            const child = exec(command);
+            
+            child.stdout.on('data', (data) => {
+                console.log(`[frontend stdout]: ${data}`);
+            });
+            
+            child.stderr.on('data', (data) => {
+                console.error(`[frontend stderr]:${data}`);
+            });    
 }
 
 // Permite obtener la información de los procesos que están corriendo, pidiéndosela al frontend.

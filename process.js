@@ -6,6 +6,7 @@ const axiosRetry = require('axios-retry');
 axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 
 const Bid = require('./model/bid');
+const Buyer = require('./model/buyer')
 
 const port = process.argv[2];
 const replicaPort = process.argv[3];
@@ -32,7 +33,8 @@ app.listen(port, () => console.log('Process online on port '+ port));
 //INTERFAZ
 app.post('/buyers',(req, res) => {
   try{
-    buyers.push(req.body);
+    buyer = Object.setPrototypeOf(req.body, Buyer.prototype);
+    buyers.push(buyer);
     res.send('Buyer created!')
   } catch(error) {
     res.status = 502;
@@ -40,7 +42,7 @@ app.post('/buyers',(req, res) => {
   }
 });
 
-app.get('buyers',(req, res) => {
+app.get('/buyers',(req, res) => {
     res.send(buyers);
 });
 

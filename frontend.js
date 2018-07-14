@@ -88,18 +88,17 @@ app.post('/buyers',(req, res) => {
     var process = getProcessRandomly();
     var buyer = req.body
     addBuyer(process,buyer)
-    .then(response=>{
-        res.send(response.data);
-        processes
-            .filter(p => p.port != process.port) //TODO: Reemplazar comparación por ID
-            .forEach(p => { 
-                addBuyer(p,buyer) });
-        
-    })
-    .catch(error => {
-        res.status = 502;
-        res.send(error.message);
-    })
+        .then(response=>{
+            res.send(response.data);
+            processes
+                .filter(p => p.port != process.port) //TODO: Reemplazar comparación por ID
+                .forEach(p => { 
+                    addBuyer(p,buyer) });
+        })
+        .catch(error => {
+            res.status = 502;
+            res.send(error.message);
+        })
 });
 
 app.post('/bids',(req, res) => {
