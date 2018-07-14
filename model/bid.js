@@ -15,6 +15,10 @@ class Bid {
             return this.price;
         }
     }
+
+    winningBuyer(){
+        return this.maxOffer.buyer;
+    }
 }
 
 module.exports = Bid;

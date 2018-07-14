@@ -29,14 +29,26 @@ function replicate() {
   return axios.post("http://localhost:"+ replicaPort +"/memory", memory);
 }
 
+// Notifica a los compradores con tags en común, que hay una nueva subasta disponible.
 function notifyNewBid(bid){
-      buyers
-        .filter(b => b.isInterested(bid.tags))
-        .forEach(b => {
-          axios.put(b.url()+'/bids',bid)
-        });
+  buyers
+    .filter(b => b.isInterested(bid.tags))
+    .forEach(b => {
+      axios.put(b.url()+'/bids',bid);
+    });
 }
 
+// Notifica a los compradores con tags en común, que hay una nueva oferta ganadora en una subasta.
+function notifyOtherInterested(bid){
+  buyers
+    .filter(b => b.isInterested(bid.tags) && b.name != bid.winningBuyer().name)
+    .forEach(b => {
+      axios.post(b.url()+'/bids',bid)
+      .catch(error =>{
+        console.log(errror.message)
+      });
+    })
+};
 
 app.listen(port, () => console.log('Process online on port '+ port));
 
@@ -89,6 +101,7 @@ app.post('/offer',(req,res) => {
   if (offer.price > bid.currentMaxOffer()) {
     offer.status = "accepted"
     bid.maxOffer = offer;
+    notifyOtherInterested(bid);
   } else {
     offer.status = "rejected"
   }

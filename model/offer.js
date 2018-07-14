@@ -1,5 +1,6 @@
 class Offer {
-    constructor(buyer,bidID,price) {
+    constructor(id, buyer,bidID,price) {
+        this.id = id;
         this.buyer = buyer;
         this.price = price;
         this.bidID = bidID;

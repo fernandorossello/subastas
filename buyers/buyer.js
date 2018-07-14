@@ -4,6 +4,9 @@ const axios = require('axios');
 const axiosRetry = require('axios-retry');
 axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 
+const UniqueIDGenerator = require('../helpers/uniqueID')
+const uniqueIDGenerator = new UniqueIDGenerator();
+
 const config = require('../config.json');
 const Bid = require('../model/bid');
 const Buyer = require('../model/buyer')
@@ -18,6 +21,7 @@ const tags = process.argv[3].split(',')
 const maxPrice = process.argv[4]
 
 const bids = []
+const pendingOffers = []
 var buyer;
 
 function init() {
@@ -41,18 +45,25 @@ app.listen(port, () => console.log('Process online on port '+ port));
 
 function offer(bid) {   
     var maxOffer = bid.currentMaxOffer()
-    if (maxPrice > maxOffer) {
-        newPrice = maxOffer+1
-        var newOffer = new Offer(buyer, bid.id, newPrice);
-        console.log("Offering "+ newPrice)
+    if ((!hasPendingOffer(bid)) && (maxPrice > maxOffer)) {
+        newPrice = maxOffer+1;
+        var uid = uniqueIDGenerator.getUID();
+        var newOffer = new Offer(uid, buyer, bid.id, newPrice);
+        console.log("Offering "+ newPrice + getTimestamp() + uid);
+        pendingOffers.push(newOffer);
         axios.post(marketURL+'/offer',newOffer)
             .then(res => {
                 // Si la oferta fue rechazada, vuelvo a ofertar recursivamente.
                 var offerRes = res.data.offer;
+                var bidRes = Object.setPrototypeOf(res.data.bid, Bid.prototype);
+
                 if (offerRes.status == 'rejected'){
-                    console.log("Offer rejected")
-                    var bidRes = Object.setPrototypeOf(res.data.bid, Bid.prototype);
+                    console.log("Offer rejected " + offerRes.price + getTimestamp()+uid)
+                    removePendingOffer(bidRes)
                     offer(bidRes);
+                } else {
+                    console.log("Offer accepted " + offerRes.price + getTimestamp()+uid)
+                    removePendingOffer(bidRes);
                 }
             })
             .catch(error => {
@@ -61,12 +72,37 @@ function offer(bid) {
     }
 }
 
+function hasPendingOffer(bid){
+    return pendingOffers.some(o => o.bidID === bid.id);
+}
+
+function removePendingOffer(bid){
+    var index = pendingOffers.findIndex(o => o.bidID === bid.id)
+    if (index > -1) {
+        pendingOffers.splice(index, 1);
+    }
+}
+
 //INTERFAZ
+// Se indica la creación de una nueva subasta
 app.put('/bids', (req, res) => {
     try{        
-        console.log('New bid!')
+        console.log('New bid!' + getTimestamp())
         var bid = Object.setPrototypeOf(req.body, Bid.prototype);
         bids.push(bid);
+        res.send();
+    } catch(error) {
+        res.status = 502;
+        res.send(error.message);
+    }
+    offer(bid);
+});
+
+//Se indica un cambio en alguna subasta en la cual el buyer está interesado
+app.post('/bids', (req, res) => {
+    try{ 
+        var bid = Object.setPrototypeOf(req.body, Bid.prototype);
+        console.log("Bid changed. New best price: ", bid.currentMaxOffer() + getTimestamp());
         res.send();
         offer(bid);
     } catch(error) {
@@ -75,3 +111,6 @@ app.put('/bids', (req, res) => {
     }
 });
 
+function getTimestamp(){
+    return ' ['+ new Date().getTime() + ']'
+}
