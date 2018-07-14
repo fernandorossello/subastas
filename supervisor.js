@@ -15,6 +15,9 @@ const frontendPort = config.Frontend.port;
 const restart  = Boolean(process.argv[2]) || false;
 const supervisionTime = 2000
 
+const UniqueIDGenerator = require('./helpers/uniqueID')
+const uniqueIDGenerator = new UniqueIDGenerator();
+
 var processes = [];
 
 app.use(express.json());
@@ -23,7 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/ping', (req, res) => res.send('pong!'));
 
 app.put('/process', (req, res) => {
-        var process = new ProcessData(req.body.address,req.body.port);
+        var process = new ProcessData(uniqueIDGenerator.getUID(),req.body.address,req.body.port);
         initProcess(process)
             .then(()=>{
                 res.send("Process listening on port "+ process.port);
@@ -156,7 +159,7 @@ function init() {
     } else {
         startFrontend(false)
             .then(()=>{
-                var process = new ProcessData('http://127.0.0.1',3001);
+                var process = new ProcessData(uniqueIDGenerator.getUID(),'http://127.0.0.1',3001);
                 initProcess(process);
             })
     }
