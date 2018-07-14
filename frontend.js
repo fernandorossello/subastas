@@ -23,7 +23,7 @@ function init() {
 
 function loadProcessData(){
     console.log('Obtaining data after shutdown');
-    axios.get('http://localhost:'+ config.Supervisor.port+'/process-list')
+    axios.get('http://localhost:'+ config.Supervisor.port+'/process')
         .then(res => {
             processes = res.data;
         });
@@ -56,7 +56,7 @@ app.post('/process', (req, res) => {
     }
 });
 
-app.get('/process-list', (req, res) => {
+app.get('/process', (req, res) => {
     try {
         res.send(processes);
     } catch(error) {

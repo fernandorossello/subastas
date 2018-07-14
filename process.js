@@ -40,7 +40,7 @@ app.post('/buyers',(req, res) => {
   }
 });
 
-app.get('/buyers-list',(req, res) => {
+app.get('buyers',(req, res) => {
     res.send(buyers);
 });
 

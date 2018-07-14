@@ -41,7 +41,7 @@ app.put('/process', (req, res) => {
             }); 
 });
 
-app.get('/process-list', (req, res) =>{
+app.get('/process', (req, res) =>{
     try {
         res.send(processes);
     } catch(error) {
@@ -215,7 +215,7 @@ function startFrontend(restart){
 // Permite obtener la información de los procesos que están corriendo, pidiéndosela al frontend.
 function loadProcessData(){
     console.log('Obtaining data after shutdown');
-    axios.get('http://localhost:'+ config.Frontend.port+'/process-list')
+    axios.get('http://localhost:'+ config.Frontend.port+'/process')
         .then(res => {
             processes = res.data;
         });
