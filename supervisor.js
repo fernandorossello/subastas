@@ -24,21 +24,14 @@ app.get('/ping', (req, res) => res.send('pong!'));
 
 app.put('/process', (req, res) => {
         var process = new ProcessData(req.body.address,req.body.port);
-        startProcess(process)
-            .then(() => {
-                startReplica(process);
-            })
-            .then(() => {
-                axios.post('http://127.0.0.1:'+frontendPort+'/process', process)
-            })
-            .then(() => {
-                processes.push(process);
+        initProcess(process)
+            .then(()=>{
                 res.send("Process listening on port "+ process.port);
             })
             .catch(error=> {
                 res.statusCode = 502;
                 res.send(error.message)
-            }); 
+            });
 });
 
 app.get('/process', (req, res) =>{
@@ -51,6 +44,23 @@ app.get('/process', (req, res) =>{
 });
 
 app.listen(port, () => console.log('Supervisor online on port '+ port));
+
+function initProcess(process){
+    return startProcess(process)
+            .then(() => {
+                startReplica(process);
+            })
+            .then(() => {
+                axios.post('http://127.0.0.1:'+frontendPort+'/process', process)
+            })
+            .then(() => {
+                processes.push(process);
+            })
+            .catch(error=> {
+                res.statusCode = 502;
+                res.send(error.message)
+            });
+}
 
 function startProcess(process) {
     return new Promise(function(resolve, reject) { 
@@ -144,7 +154,11 @@ function init() {
     if(restart){
         loadProcessData();
     } else {
-        startFrontend(false);
+        startFrontend(false)
+            .then(()=>{
+                var process = new ProcessData('http://127.0.0.1',3001);
+                initProcess(process);
+            })
     }
     
     // Supervisión de los procesos para levantarlos en caso de caídas
@@ -166,6 +180,14 @@ function keepAliveFrontend(){
     .catch( error =>{
         console.log(error.message);
         startFrontend(true);
+        initProcess(process)
+            .then(()=>{
+                res.send("Process listening on port "+ process.port);
+            })
+            .catch(error=> {
+                res.statusCode = 502;
+                res.send(error.message)
+            });
     });
 }
 
@@ -193,6 +215,8 @@ function ping (port) {
 
 // Inicia el proceso de frontend.
 function startFrontend(restart){
+    return new Promise(function(resolve, reject) { 
+        try {         
             var command = 'node frontend.js ' + frontendPort
             if (restart){
                 command += ' ' + true
@@ -206,7 +230,14 @@ function startFrontend(restart){
             
             child.stderr.on('data', (data) => {
                 console.error(`[frontend stderr]:${data}`);
-            });    
+            });
+            ping(frontendPort)
+                .then(()=>{
+                    resolve();
+                });       
+        } catch(error) {
+            reject(error.message);
+        }});
 }
 
 // Permite obtener la información de los procesos que están corriendo, pidiéndosela al frontend.
