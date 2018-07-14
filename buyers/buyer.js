@@ -39,13 +39,21 @@ init();
 
 app.listen(port, () => console.log('Process online on port '+ port));
 
-function offer(bid) {
-    maxOffer = bid.currentMaxOffer()
-    if (bid.currentMaxOffer() >= maxPrice) {
-        var offer = new Offer(buyer, bid, maxOffer+1);
-        axios.post(marketURL+'/bids/'+bid.id,offer)
+function offer(bid) {   
+    var maxOffer = bid.currentMaxOffer()
+    if (maxPrice > maxOffer) {
+        newPrice = maxOffer+1
+        var newOffer = new Offer(buyer, bid.id, newPrice);
+        console.log("Offering "+ newPrice)
+        axios.post(marketURL+'/offer',newOffer)
             .then(res => {
-                console.log(res.data);
+                // Si la oferta fue rechazada, vuelvo a ofertar recursivamente.
+                var offerRes = res.data.offer;
+                if (offerRes.status == 'rejected'){
+                    console.log("Offer rejected")
+                    var bidRes = Object.setPrototypeOf(res.data.bid, Bid.prototype);
+                    offer(bidRes);
+                }
             })
             .catch(error => {
                 console.log(error.message);
@@ -60,6 +68,7 @@ app.put('/bids', (req, res) => {
         var bid = Object.setPrototypeOf(req.body, Bid.prototype);
         bids.push(bid);
         res.send();
+        offer(bid);
     } catch(error) {
         res.status = 502;
         res.send(error.message);

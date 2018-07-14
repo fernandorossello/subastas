@@ -9,10 +9,10 @@ class Bid {
     }
 
     currentMaxOffer() {
-        if (this.maxOffer != undefined){
+        if (this.maxOffer !== undefined){
             return this.maxOffer.price;
         } else {
-            this.price;
+            return this.price;
         }
     }
 }

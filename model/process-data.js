@@ -5,6 +5,10 @@ class ProcessData {
         this.port = parseInt(port, 10);
         this.replica = this.port +1;
     }
+
+    getURL(){
+        return this.address+':'+this.port;
+    }
 }
 
 module.exports = ProcessData;

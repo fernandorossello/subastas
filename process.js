@@ -7,6 +7,7 @@ axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 
 const Bid = require('./model/bid');
 const Buyer = require('./model/buyer')
+const Offer = require('./model/offer')
 
 const port = process.argv[2];
 const replicaPort = process.argv[3];
@@ -80,6 +81,16 @@ app.post('/memory',(req,res) => {
   var mem = req.body;
   memory = Object.setPrototypeOf(req.body, Memory.prototype);
   res.send();
-})
+});
 
-
+app.post('/offer',(req,res) => {
+  var offer = Object.setPrototypeOf(req.body, Offer.prototype);
+  var bid = memory.getBidById(offer.bidID);
+  if (offer.price > bid.currentMaxOffer()) {
+    offer.status = "accepted"
+    bid.maxOffer = offer;
+  } else {
+    offer.status = "rejected"
+  }
+  res.send(JSON.stringify({offer:offer, bid:bid}))
+});
