@@ -1,6 +1,7 @@
 class Memory {
     constructor(address,port) {
         this.bids = [];
+        this.closedBids = [];
     }
 
     addBid(bid) {
@@ -16,11 +17,14 @@ class Memory {
         this.bids[index].maxOffer = offer;
     }
 
-    removeBid(id){
+    closeBid(id){
         var index = this.bids.findIndex(b => b.id == id)
+        var bid = this.bids.find(b => b.id == id)
+        
         if (index > -1) {
             this.bids.splice(index, 1);
         }
+        this.closedBids.push(bid)
     }
 }
 

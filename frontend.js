@@ -115,8 +115,9 @@ app.post('/buyers',(req, res) => {
 
 app.post('/bids',(req, res) => {
     var process = getProcessRandomly();
-    var bid = Object.setPrototypeOf(req.body, Bid.prototype);
-    bid.id = process.id +'-'+ uniqueIDGenerator.getUID();
+    var bidID = process.id +'-'+ uniqueIDGenerator.getUID();
+    var bid = new Bid(bidID,req.body.tags,req.body.price,req.body.duration);
+    
     axios.post(process.getURL()+"/bids", bid)
         .then(response=>{
             res.send(response.data);

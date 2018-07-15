@@ -49,7 +49,7 @@ function offer(bid) {
         newPrice = maxOffer+1;
         var uid = uniqueIDGenerator.getUID();
         var newOffer = new Offer(uid, buyer, bid.id, newPrice);
-        console.log("Offering "+ newPrice + getTimestamp() + uid);
+        console.log("Offering "+ newPrice + ' ' + uid);
         pendingOffers.push(newOffer);
         axios.post(marketURL+'/offer',newOffer)
             .then(res => {
@@ -58,11 +58,11 @@ function offer(bid) {
                 var bidRes = Object.setPrototypeOf(res.data.bid, Bid.prototype);
 
                 if (offerRes.status == 'rejected'){
-                    console.log("Offer rejected " + offerRes.price + getTimestamp()+uid)
+                    console.log("Offer rejected " + offerRes.price + ' ' +uid)
                     removePendingOffer(bidRes)
                     offer(bidRes);
                 } else {
-                    console.log("Offer accepted " + offerRes.price + getTimestamp()+uid)
+                    console.log("Offer accepted " + offerRes.price + ' ' +uid)
                     removePendingOffer(bidRes);
                 }
             })
@@ -87,7 +87,7 @@ function removePendingOffer(bid){
 // Se indica la creación de una nueva subasta
 app.put('/bids', (req, res) => {
     try{        
-        console.log('New bid!' + getTimestamp())
+        console.log('New bid!')
         var bid = Object.setPrototypeOf(req.body, Bid.prototype);
         bids.push(bid);
         res.send();
@@ -102,7 +102,7 @@ app.put('/bids', (req, res) => {
 app.post('/bids', (req, res) => {
     try{ 
         var bid = Object.setPrototypeOf(req.body, Bid.prototype);
-        console.log("Bid changed. New best price: ", bid.currentMaxOffer() + getTimestamp());
+        console.log("Bid changed. New best price:", bid.currentMaxOffer());
         res.send();
         offer(bid);
     } catch(error) {
@@ -111,6 +111,15 @@ app.post('/bids', (req, res) => {
     }
 });
 
-function getTimestamp(){
-    return ' ['+ new Date().getTime() + ']'
-}
+// Se indica que una subasta se cerró
+app.post('/bids-close', (req, res) => {
+    try{ 
+        var bid = Object.setPrototypeOf(req.body.bid, Bid.prototype);
+        var message = req.body.message;
+        console.log( message + ' Bid:' + bid.id);
+        res.send();
+    } catch(error) {
+        res.status = 502;
+        res.send(error.message);
+    }
+});

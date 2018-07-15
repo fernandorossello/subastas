@@ -29,6 +29,30 @@ function replicate() {
   return axios.post("http://localhost:"+ replicaPort +"/memory", memory);
 }
 
+function checkExpiredBids(){
+  memory.bids
+    .filter(b => b.isExpired())
+    .forEach(b => {
+      memory.closeBid(b.id);
+      console.log("Bid expired. " + b.id);
+      buyers
+        .filter(bu => bu.isInterested(b.tags))
+        .forEach(bu => {
+          var message;
+          if ((b.maxOffer != undefined) && (bu.name == b.maxOffer.buyer.name)){
+              message = 'You won the bid.';   
+          } else {
+              message = 'You lost the bid.';
+          }
+          axios.post(bu.url()+'/bids-close',{bid:b,message:message})
+            .catch(error => console.log(error.message));
+        });
+        replicate();
+    });
+
+    setTimeout(checkExpiredBids,500);
+}
+
 // Notifica a los compradores con tags en común, que hay una nueva subasta disponible.
 function notifyNewBid(bid){
   buyers
@@ -39,7 +63,7 @@ function notifyNewBid(bid){
 }
 
 // Notifica a los compradores con tags en común, que hay una nueva oferta ganadora en una subasta.
-function notifyOtherInterested(bid){
+function notifyOthersInterested(bid){
   buyers
     .filter(b => b.isInterested(bid.tags) && b.name != bid.winningBuyer().name)
     .forEach(b => {
@@ -49,6 +73,12 @@ function notifyOtherInterested(bid){
       });
     })
 };
+
+function init(){
+    setTimeout(checkExpiredBids,500);
+}
+
+init();
 
 app.listen(port, () => console.log('Process online on port '+ port));
 
@@ -101,7 +131,8 @@ app.post('/offer',(req,res) => {
   if (offer.price > bid.currentMaxOffer()) {
     offer.status = "accepted"
     bid.maxOffer = offer;
-    notifyOtherInterested(bid);
+    replicate();
+    notifyOthersInterested(bid);
   } else {
     offer.status = "rejected"
   }

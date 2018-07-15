@@ -1,11 +1,12 @@
 class Bid {
-    constructor(tags,price,duration, article) {
-        this.id = undefined
+    constructor(id,tags,price, duration, article) {
+        this.id = id
         this.tags = tags;
         this.price = price;
         this.duration = duration;
         this.article = article;
         this.maxOffer = undefined;
+        this.expiration = new Date().getTime() + duration;
     }
 
     currentMaxOffer() {
@@ -18,6 +19,10 @@ class Bid {
 
     winningBuyer(){
         return this.maxOffer.buyer;
+    }
+
+    isExpired() {
+        return (new Date().getTime() > this.expiration);
     }
 }
 
