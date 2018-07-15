@@ -3,7 +3,7 @@ const { exec } = require('child_process');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 
-axiosRetry(axios, { retries: 3, retryDelay: function (retryCount) { return retryCount*1000}});
+axiosRetry(axios, { retries: 3, retryDelay: function () {return 500}});
 
 
 const ProcessData = require('./model/process-data');
@@ -38,24 +38,16 @@ app.put('/process', (req, res) => {
             });
 });
 
-app.get('/process', (req, res) =>{
-    try {
-        res.send(processes);
-    } catch(error) {
-        res.statusCode = 502;
-        res.send(error.message)
-    }
-});
-
 app.listen(port, () => console.log('Supervisor online on port '+ port));
 
+// Inicia un proceso, su réplica y lo registra en el frontend.
 function initProcess(process){
     return startProcess(process)
             .then(() => {
                 startReplica(process);
             })
             .then(() => {
-                axios.post('http://127.0.0.1:'+frontendPort+'/process', process)
+                notifyNewProcessToFrontend(process);
             })
             .then(() => {
                 processes.push(process);
@@ -64,6 +56,32 @@ function initProcess(process){
                 res.statusCode = 502;
                 res.send(error.message)
             });
+}
+
+function notifyNewProcessToFrontend(process) {
+    return axios.post('http://127.0.0.1:'+frontendPort+'/process', process);
+}
+
+// Inicia el proceso de frontend.
+function startFrontend(){
+    return new Promise(function(resolve, reject) { 
+        try {                     
+            const child = exec('node frontend.js ' + frontendPort);
+            
+            child.stdout.on('data', (data) => {
+                console.log(`[frontend stdout]: ${data}`);
+            });
+            
+            child.stderr.on('data', (data) => {
+                console.error(`[frontend stderr]:${data}`);
+            });
+            ping(frontendPort)
+                .then(()=>{
+                    resolve();
+                });       
+        } catch(error) {
+            reject(error.message);
+        }});
 }
 
 function startProcess(process) {
@@ -85,7 +103,6 @@ function startProcess(process) {
         } catch(error) {
             reject(error.message);
         }});
-       
 }
 
 function startReplica(process){
@@ -110,15 +127,31 @@ function startReplica(process){
         }});
 }
 
+// Reinicia el proceso de frontend y le setea todos los procesos existentes.
+function restartFrontend(){
+    startFrontend()
+        .then(() =>{
+            processes.forEach(p => {
+                notifyNewProcessToFrontend(p)
+                    .catch(error=> {
+                        console.log("Error notifying process to frontend. " + error.message);
+                    });
+            })
+        })
+        .catch(error=> {
+            console.log(error.message);
+        });
+}
+
 function restartProcess(process){
     //Levanta el proceso
     //Obtener los datos para replicar
     //Setea la memoria
     startProcess(process)
-        .then(res =>{
+        .then(() =>{
             return getMemory(process.address,process.replica)
         })
-        .then(res =>{
+        .then(() =>{
             setMemory(process.address,process.port,res.data);
         })
         .catch(error=> {
@@ -183,11 +216,11 @@ function keepAliveFrontend(){
     ping(frontendPort)
     .catch( error =>{
         console.log(error.message);
-        startFrontend(true);
+        restartFrontend();
     });
 }
 
-// Mantiene levantados los procesos que manejan las subastas
+// Mantiene levantados los procesos que manejan las subastas y sus réplicas
 function keepAliveProcesses(){
     processes.forEach(process => {
         ping(process.port)
@@ -207,33 +240,6 @@ function keepAliveProcesses(){
 // Genera una promise de un get de ping a un puerto determinado
 function ping (port) {
     return axios.get('http://127.0.0.1:'+port+'/ping');
-}
-
-// Inicia el proceso de frontend.
-function startFrontend(restart){
-    return new Promise(function(resolve, reject) { 
-        try {         
-            var command = 'node frontend.js ' + frontendPort
-            if (restart){
-                command += ' ' + true
-            }
-
-            const child = exec(command);
-            
-            child.stdout.on('data', (data) => {
-                console.log(`[frontend stdout]: ${data}`);
-            });
-            
-            child.stderr.on('data', (data) => {
-                console.error(`[frontend stderr]:${data}`);
-            });
-            ping(frontendPort)
-                .then(()=>{
-                    resolve();
-                });       
-        } catch(error) {
-            reject(error.message);
-        }});
 }
 
 // Permite obtener la información de los procesos que están corriendo, pidiéndosela al frontend.

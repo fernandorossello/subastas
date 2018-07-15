@@ -15,7 +15,6 @@ axiosRetry(http, { retries: 3, shouldResetTimeout:true, retryDelay: function (re
 const app = express();
 
 const port = process.argv[2];
-const restart = Boolean(process.argv[3]) || false;
 
 const UniqueIDGenerator = require('./helpers/uniqueID')
 const uniqueIDGenerator = new UniqueIDGenerator();
@@ -23,21 +22,6 @@ var processes = [];
 
 app.use(express.json() );
 app.use(express.urlencoded({ extended: true }));
-
-
-function init() {
-    if(restart){
-        loadProcessData();
-    }
-}
-
-function loadProcessData() {
-    console.log('Obtaining data after shutdown');
-    http.get('http://localhost:'+ config.Supervisor.port+'/process')
-        .then(res => {
-            processes = res.data;
-        });
-}
 
 // Genera un post al proceso dado para cargar un comprador.
 function addBuyer(process,buyer){
@@ -53,8 +37,6 @@ function getProcessRandomly() {
 function getProcessByID(id){
     return processes.find(p => p.id == id);
 }
-
-init();
 
 app.listen(port, () => console.log('Frontend online on port '+ port));
 

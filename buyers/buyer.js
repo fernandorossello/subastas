@@ -2,13 +2,7 @@ const express = require('express');
 const app = express();
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
-
-
 axiosRetry(axios, { retries: 3, retryDelay: function (retryCount) { return retryCount*1000}});
-/*const http = axios.create();
-http.defaults.timeout = 2500;
-axiosRetry(http, { retries: 3, shouldResetTimeout:true, retryDelay: function (retryCount) {return retryCount*2000}});
-*/
 
 const UniqueIDGenerator = require('../helpers/uniqueID')
 const uniqueIDGenerator = new UniqueIDGenerator();
