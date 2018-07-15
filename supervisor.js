@@ -24,22 +24,6 @@ var processes = [];
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/ping', (req, res) => res.send('pong!'));
-
-app.put('/process', (req, res) => {
-        var process = new ProcessData(uniqueIDGenerator.getUID(),req.body.address,req.body.port);
-        initProcess(process)
-            .then(()=>{
-                res.send("Process listening on port "+ process.port);
-            })
-            .catch(error=> {
-                res.statusCode = 502;
-                res.send(error.message)
-            });
-});
-
-app.listen(port, () => console.log('Supervisor online on port '+ port));
-
 // Inicia un proceso, su réplica y lo registra en el frontend.
 function initProcess(process){
     return startProcess(process)
@@ -53,7 +37,7 @@ function initProcess(process){
                 processes.push(process);
             })
             .catch(error=> {
-                res.statusCode = 502;
+                res.statusCode = 500;
                 res.send(error.message)
             });
 }
@@ -252,5 +236,42 @@ function loadProcessData(){
 }
 
 init();
+
+//INTERFAZ
+app.listen(port, () => console.log('Supervisor online on port '+ port));
+
+app.get('/ping', (req, res) => res.send('pong!'));
+
+app.put('/process', (req, res) => {
+        var process = new ProcessData(uniqueIDGenerator.getUID(),req.body.address,req.body.port);
+        initProcess(process)
+            .then(()=>{
+                res.send("Process listening on port "+ process.port);
+            })
+            .catch(error=> {
+                res.statusCode = 500;
+                res.send(error.message)
+            });
+});
+
+app.post('/process-bids',(req, res) => {
+    var action = req.body.action;
+    if(action == 'add'){
+        maxPort = Math.max(...processes.map(p => p.port)) + 2;
+        console.log("Max port:" + maxPort)
+        var process = new ProcessData(uniqueIDGenerator.getUID(),'http://127.0.0.1', maxPort);
+        initProcess(process)
+            .then(()=>{
+                console.log("Process listening on port "+ process.port)
+                res.send();
+            })
+            .catch(error=> {
+                res.statusCode = 500;
+                res.send(error.message)
+            });
+    } else {
+        // TODO: Agregar lógica para 
+    }
+});
 
 

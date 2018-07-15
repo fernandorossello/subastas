@@ -106,7 +106,7 @@ app.put('/bids', (req, res) => {
         bids.push(bid);
         res.send();
     } catch(error) {
-        res.status = 502;
+        res.status = 500;
         res.send(error.message);
     }
     offer(bid);
@@ -120,7 +120,7 @@ app.post('/bids', (req, res) => {
         res.send();
         offer(bid);
     } catch(error) {
-        res.status = 502;
+        res.status = 500;
         res.send(error.message);
     }
 });
@@ -134,7 +134,7 @@ app.post('/bids-close', (req, res) => {
         console.log( message + ' Bid:' + bid.id);
         res.send();
     } catch(error) {
-        res.status = 502;
+        res.status = 500;
         res.send(error.message);
     }
 });

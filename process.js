@@ -5,6 +5,7 @@ const axios = require('axios');
 const axiosRetry = require('axios-retry');
 axiosRetry(axios, { retries: 3, retryDelay: function (retryCount) {return retryCount*1000}});
 
+const config = require('./config.json');
 
 const Bid = require('./model/bid');
 const Buyer = require('./model/buyer')
@@ -18,6 +19,8 @@ app.use(express.urlencoded({ extended: true }));
 
 const Memory = require('./memory.js')
 var memory = new Memory();
+
+const maxBids = 3;
 
 app.use(function(req, res, next) {
     res.set('X-Server-Name',"process_"+port);
@@ -92,6 +95,21 @@ function notifyActiveBids(buyer){
 function init(){
     setTimeout(checkExpiredBids,500);
 }
+// Notifica al supervisor si llegó al máximo de subastas posibles o si está sin trabajo.
+function notifySupervisor(){
+  var amount = memory.bids.length;
+  if (amount >= maxBids) {
+    axios.post('http://127.0.0.1:'+ config.Supervisor.port + '/process-bids',{action:'add'})
+      .catch(error => {
+        console.log(error);
+      });
+  }
+  
+  if(amount == 0){
+
+  }
+
+}
 
 init();
 
@@ -108,7 +126,7 @@ app.post('/buyers',(req, res) => {
     notifyActiveBids(buyer);
     replicate();
   } catch(error) {
-    res.status = 502;
+    res.status = 500;
     res.send(error.message);
   }
 });
@@ -119,15 +137,21 @@ app.get('/buyers',(req, res) => {
 
 app.post('/bids',(req, res) => {
   try{
-    var bid = Object.setPrototypeOf(req.body, Bid.prototype);
-    memory.addBid(bid);
-    replicate()
-    .then(() => {
-      res.send("Bid added! Bid ID: " + bid.id);
-      notifyNewBid(bid);
-    });
+    if (memory.bids.length < maxBids) {
+      var bid = Object.setPrototypeOf(req.body, Bid.prototype);
+      memory.addBid(bid);
+      notifySupervisor();
+      replicate()
+        .then(() => {
+          res.send("Bid added! Bid ID: " + bid.id);
+          notifyNewBid(bid);
+      });
+    } else {
+      res.statusCode = 503;
+      res.send("No memory");
+    }
   } catch(error) {
-    res.status = 502;
+    res.status = 500;
     res.send(error.message);
   }
 });
@@ -183,4 +207,4 @@ app.post('/bids-cancel',(req, res) => {
   } else {
     res.send('No active bid for ID ' + bidID);
   }
-})
+});

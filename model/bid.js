@@ -1,6 +1,6 @@
 class Bid {
-    constructor(id,tags,price, duration, article) {
-        this.id = id
+    constructor(tags,price, duration, article) {
+        this.id = undefined
         this.tags = tags;
         this.price = price;
         this.duration = duration;

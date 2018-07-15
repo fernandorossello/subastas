@@ -8,6 +8,15 @@ const Offer = require('./model/offer');
 const ProcessData = require('./model/process-data');
 
 const http = axios.create();
+http.interceptors.response.use(
+    res => {
+      return res;
+    },
+    error => {
+  
+      return Promise.reject(error.response)
+    }
+  );
 http.defaults.timeout = 2500;
 axiosRetry(http, { retries: 3, shouldResetTimeout:true, retryDelay: function (retryCount) {return retryCount*2000}});
 
@@ -49,8 +58,8 @@ app.post('/process', (req, res) => {
         processes.push(process);
         res.send();
     } catch(error) {
-        res.statusCode = 502;
-        res.send(error.message)
+        res.statusCode = 500;
+        res.send(error.data)
     }
 });
 
@@ -58,23 +67,9 @@ app.get('/process', (req, res) => {
     try {
         res.send(processes);
     } catch(error) {
-        res.statusCode = 502;
-        res.send(error.message)
+        res.statusCode = 500;
+        res.send(error.data)
     }
-});
-
-app.get('/ping-to-process', (req, res) => {
-        const process = getProcessRandomly();
-
-        http.get(process.getURL()+"/ping")
-        .then(response =>{
-            res.status = response.status;
-            res.send(response.data);
-        })
-        .catch(error => {
-            res.status = response.status;
-            res.send(error.message);
-        });
 });
 
 app.get('/status', (req, res) => {
@@ -89,30 +84,50 @@ app.post('/buyers',(req, res) => {
         .then(response => {
             res.send(response.data);
             processes
-                .filter(p => p.port != process.port) //TODO: Reemplazar comparación por ID
+                .filter(p => p.id != process.id)
                 .forEach(p => { 
-                    addBuyer(p,buyer) });
+                    addBuyer(p,buyer)});
         })
         .catch(error => {
-            res.status = 502;
+            res.statusCode = 500;
             res.send(error.message);
         })
 });
 
 app.post('/bids',(req, res) => {
-    var process = getProcessRandomly();
-    var bidID = process.id +'-'+ uniqueIDGenerator.getUID();
-    var bid = new Bid(bidID,req.body.tags,req.body.price,req.body.duration);
     
-    http.post(process.getURL()+"/bids", bid)
-        .then(response=>{
+    var bid = new Bid(req.body.tags,req.body.price,req.body.duration);
+    
+    distributeBid(bid)
+        .then(response => {
             res.send(response.data);
         })
-        .catch(error => {
-            res.status = 502;
-            res.send(error.message);
-        })    
+        .catch(error =>{
+            res.statusCode = error.status;
+            res.send(error.data);
+        })
 });
+
+function distributeBid(bid) {
+    return new Promise(function(resolve, reject) {
+        var process = getProcessRandomly();
+        bid.id = process.id +'-'+ uniqueIDGenerator.getUID();
+        http.post(process.getURL()+"/bids", bid)
+            .then(response =>{
+                resolve(response);
+            })
+            .catch(error => {
+                if (error.status == 503) {
+                    distributeBid(bid)
+                        .then(response => {
+                            resolve(response);
+                        });
+                } else {
+                    reject(error.data);
+                }           
+            });
+    });
+}
 
 app.post('/offer',(req, res) => {
     var offer = Object.setPrototypeOf(req.body, Offer.prototype);
@@ -122,8 +137,8 @@ app.post('/offer',(req, res) => {
             res.send(response.data);
         })
         .catch(error => {
-            res.status = 502;
-            res.send(error.message);
+            res.statusCode = 500;
+            res.send(error.data);
         });
 });
 
@@ -131,7 +146,7 @@ app.post('/bids-cancel',(req, res) => {
     var bidID = req.body.bidID;
     var process = getProcessByID(bidID.split('-')[0]);
     if (process == undefined){
-        res.status = 502;
+        res.statusCode = 500;
         res.send("No active bid for ID bidID");
     } else {
         http.post(process.getURL()+'/bids-cancel',req.body)
@@ -139,8 +154,8 @@ app.post('/bids-cancel',(req, res) => {
                 res.send(response.data);
             })
             .catch(error =>{
-                res.status = 502;
-                res.send(error.message);
+                res.statusCode = 500;
+                res.send(error.data);
             });
     }
 })
