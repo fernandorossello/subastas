@@ -33,7 +33,7 @@ function checkExpiredBids(){
   memory.bids
     .filter(b => b.isExpired())
     .forEach(b => {
-      console.log("Bid expired. " + bid.id);
+      console.log("Bid expired. " + b.id);
       closeBid(b,'finished');
     });
 
