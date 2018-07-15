@@ -82,6 +82,14 @@ function notifyOthersInterested(bid){
     })
 };
 
+function notifyActiveBids(buyer){
+  memory.bids
+    .filter(bid => buyer.isInterested(bid.tags))
+    .forEach(bid => {
+      axios.put(buyer.url()+'/bids',bid);
+    });
+}
+
 function init(){
     setTimeout(checkExpiredBids,500);
 }
@@ -98,6 +106,7 @@ app.post('/buyers',(req, res) => {
     buyer = Object.setPrototypeOf(req.body, Buyer.prototype);
     buyers.push(buyer);
     res.send('Buyer created!')
+    notifyActiveBids(buyer);
   } catch(error) {
     res.status = 502;
     res.send(error.message);
