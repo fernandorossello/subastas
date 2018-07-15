@@ -145,7 +145,7 @@ app.post('/memory',(req,res) => {
 app.post('/offer',(req,res) => {
   var offer = Object.setPrototypeOf(req.body, Offer.prototype);
   var bid = memory.getBidById(offer.bidID);
-  if (offer.price > bid.currentMaxOffer()) {
+  if (bid != undefined && offer.price > bid.currentMaxOffer()) {
     offer.status = "accepted"
     bid.maxOffer = offer;
     replicate();
