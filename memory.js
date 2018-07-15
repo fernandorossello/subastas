@@ -17,10 +17,10 @@ class Memory {
         this.bids[index].maxOffer = offer;
     }
 
-    closeBid(id){
+    closeBid(id,status){
         var index = this.bids.findIndex(b => b.id == id)
         var bid = this.bids.find(b => b.id == id)
-        
+        bid.status = status;
         if (index > -1) {
             this.bids.splice(index, 1);
         }

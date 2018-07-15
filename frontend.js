@@ -131,7 +131,6 @@ app.post('/bids',(req, res) => {
 app.post('/offer',(req, res) => {
     var offer = Object.setPrototypeOf(req.body, Offer.prototype);
     var process = getProcessByID(offer.bidID.split('-')[0]);
-
     axios.post(process.getURL()+'/offer',offer)
         .then(response =>{
             res.send(response.data);
@@ -141,3 +140,21 @@ app.post('/offer',(req, res) => {
             res.send(error.message);
         });
 });
+
+app.post('/bids-cancel',(req, res) => {
+    var bidID = req.body.bidID;
+    var process = getProcessByID(bidID.split('-')[0]);
+    if (process == undefined){
+        res.status = 502;
+        res.send("No active bid for ID bidID");
+    } else {
+        axios.post(process.getURL()+'/bids-cancel',req.body)
+            .then(response =>{
+                res.send(response.data);
+            })
+            .catch(error =>{
+                res.status = 502;
+                res.send(error.message);
+            });
+    }
+})

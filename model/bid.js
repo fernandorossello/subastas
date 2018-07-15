@@ -7,6 +7,7 @@ class Bid {
         this.article = article;
         this.maxOffer = undefined;
         this.expiration = new Date().getTime() + duration;
+        this.status = 'open'
     }
 
     currentMaxOffer() {
@@ -17,7 +18,7 @@ class Bid {
         }
     }
 
-    winningBuyer(){
+    winningBuyer() {
         return this.maxOffer.buyer;
     }
 

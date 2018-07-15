@@ -33,24 +33,32 @@ function checkExpiredBids(){
   memory.bids
     .filter(b => b.isExpired())
     .forEach(b => {
-      memory.closeBid(b.id);
-      console.log("Bid expired. " + b.id);
-      buyers
-        .filter(bu => bu.isInterested(b.tags))
-        .forEach(bu => {
-          var message;
-          if ((b.maxOffer != undefined) && (bu.name == b.maxOffer.buyer.name)){
+      console.log("Bid expired. " + bid.id);
+      closeBid(b,'finished');
+    });
+
+    setTimeout(checkExpiredBids,500);
+}
+
+function closeBid(bid,status){
+    memory.closeBid(bid.id, status);
+    buyers
+      .filter(bu => bu.isInterested(bid.tags))
+      .forEach(bu => {
+        var message;
+        if(status != 'canceled'){
+          if ((bid.maxOffer != undefined) && (bu.name == bid.maxOffer.buyer.name)){
               message = 'You won the bid.';   
           } else {
               message = 'You lost the bid.';
           }
-          axios.post(bu.url()+'/bids-close',{bid:b,message:message})
-            .catch(error => console.log(error.message));
-        });
-        replicate();
-    });
-
-    setTimeout(checkExpiredBids,500);
+        } else {
+          message = 'Bid was cancelled'
+        }
+        axios.post(bu.url()+'/bids-close',{bid:bid,message:message})
+          .catch(error => console.log(error.message));
+      });
+      replicate();
 }
 
 // Notifica a los compradores con tags en común, que hay una nueva subasta disponible.
@@ -106,7 +114,7 @@ app.post('/bids',(req, res) => {
     memory.addBid(bid);
     replicate()
     .then(() => {
-      res.send("Bid added!");
+      res.send("Bid added! Bid ID: " + bid.id);
       notifyNewBid(bid);
     });
   } catch(error) {
@@ -138,3 +146,14 @@ app.post('/offer',(req,res) => {
   }
   res.send(JSON.stringify({offer:offer, bid:bid}))
 });
+
+app.post('/bids-cancel',(req, res) => {
+  var bidID = req.body.bidID;
+  var bid = memory.getBidById(bidID);
+  if (bid != undefined) {
+    closeBid(bid,'canceled');
+    res.send('The bid was cancelled');
+  } else {
+    res.send('No active bid for ID ' + bidID);
+  }
+})
