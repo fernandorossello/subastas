@@ -1,0 +1,164 @@
+{
+	"id": "7941dc6c-88cf-4afe-9413-02f7f00d60cf",
+	"name": "TP",
+	"description": "",
+	"auth": null,
+	"events": null,
+	"variables": [],
+	"order": [
+		"41619eb2-fae8-41d8-b034-ffd36ebf9da7",
+		"87c63844-de1c-4d84-b8b0-7bf374448a84",
+		"8b170c99-efe0-4295-bd85-da82765e7cec",
+		"91dd188d-8b6f-4e18-b94b-7d24da93853c",
+		"10151a45-273a-43d8-ba8f-aecf90a1290b",
+		"d3c5a046-d586-4c66-9522-b220257d9b80",
+		"694a115d-8764-4766-b583-59da9aa91d43"
+	],
+	"folders_order": [],
+	"folders": [],
+	"requests": [
+		{
+			"id": "10151a45-273a-43d8-ba8f-aecf90a1290b",
+			"name": "New Bid",
+			"url": "localhost:4000/bids",
+			"description": "",
+			"data": [],
+			"dataMode": "raw",
+			"headerData": [
+				{
+					"key": "Content-Type",
+					"value": "application/json"
+				}
+			],
+			"method": "POST",
+			"pathVariableData": [],
+			"queryParams": [],
+			"auth": null,
+			"events": [],
+			"folder": null,
+			"rawModeData": "{\n\t\"tags\":[\"juguetes\",\"pokemon\"],\n\t\"price\": 500,\n\t\"duration\": 50000,\n\t\"article\":{\"name\":\"Pikachu\",\"size\":\"small\"}\n}",
+			"headers": "Content-Type: application/json\n",
+			"pathVariables": {}
+		},
+		{
+			"id": "41619eb2-fae8-41d8-b034-ffd36ebf9da7",
+			"name": "Add buyer",
+			"url": "localhost:4000/buyers",
+			"description": "",
+			"data": [],
+			"dataMode": "raw",
+			"headerData": [
+				{
+					"key": "Content-Type",
+					"value": "application/json"
+				}
+			],
+			"method": "POST",
+			"pathVariableData": [],
+			"queryParams": [],
+			"auth": null,
+			"events": [],
+			"folder": null,
+			"rawModeData": "{\n\"name\":\"Buyer1\",\n\"Port\": 4001\n}",
+			"headers": "Content-Type: application/json\n",
+			"pathVariables": {}
+		},
+		{
+			"id": "694a115d-8764-4766-b583-59da9aa91d43",
+			"name": "Check process memory",
+			"url": "localhost:3005/memory",
+			"description": "",
+			"data": null,
+			"dataMode": "params",
+			"headerData": [],
+			"method": "GET",
+			"pathVariableData": [],
+			"queryParams": [],
+			"auth": null,
+			"events": [],
+			"folder": null,
+			"headers": "",
+			"pathVariables": {}
+		},
+		{
+			"id": "87c63844-de1c-4d84-b8b0-7bf374448a84",
+			"name": "Get buyers",
+			"url": "localhost:3006/buyers-list",
+			"description": "",
+			"data": null,
+			"dataMode": "params",
+			"headerData": [],
+			"method": "GET",
+			"pathVariableData": [],
+			"queryParams": [],
+			"auth": null,
+			"events": [],
+			"folder": null,
+			"headers": "",
+			"pathVariables": {}
+		},
+		{
+			"id": "8b170c99-efe0-4295-bd85-da82765e7cec",
+			"name": "Add process",
+			"url": "localhost:3000/process",
+			"description": "",
+			"data": [],
+			"dataMode": "raw",
+			"headerData": [
+				{
+					"key": "Content-Type",
+					"value": "application/json"
+				}
+			],
+			"method": "PUT",
+			"pathVariableData": [],
+			"queryParams": [],
+			"auth": null,
+			"events": [],
+			"folder": null,
+			"rawModeData": "{\n\t\"port\": 3004,\n\t\"address\": \"http://127.0.0.1\"\n}",
+			"headers": "Content-Type: application/json\n",
+			"pathVariables": {}
+		},
+		{
+			"id": "91dd188d-8b6f-4e18-b94b-7d24da93853c",
+			"name": "Get processes",
+			"url": "localhost:3000/process",
+			"description": "",
+			"data": null,
+			"dataMode": "params",
+			"headerData": [],
+			"method": "GET",
+			"pathVariableData": [],
+			"queryParams": [],
+			"auth": null,
+			"events": [],
+			"folder": null,
+			"headers": "",
+			"pathVariables": {}
+		},
+		{
+			"id": "d3c5a046-d586-4c66-9522-b220257d9b80",
+			"name": "Cancel bid",
+			"url": "localhost:4000/bids-cancel",
+			"description": "",
+			"data": [],
+			"dataMode": "raw",
+			"headerData": [
+				{
+					"key": "Content-Type",
+					"value": "application/json"
+				}
+			],
+			"method": "POST",
+			"pathVariableData": [],
+			"queryParams": [],
+			"auth": null,
+			"events": [],
+			"folder": null,
+			"rawModeData": "{\n\t\"bidID\": \"hb63-76qq\"\n}",
+			"headers": "Content-Type: application/json\n",
+			"pathVariables": {}
+		}
+	]
+}
