@@ -25,6 +25,11 @@ class Bid {
     isExpired() {
         return (new Date().getTime() > this.expiration);
     }
+
+    extendTime(){
+        this.expiration += 5000;
+        this.duration += 5000;
+    }
 }
 
 module.exports = Bid;

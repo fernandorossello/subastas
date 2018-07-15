@@ -3,7 +3,8 @@ const { exec } = require('child_process');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 
-axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
+axiosRetry(axios, { retries: 3, retryDelay: function (retryCount) { return retryCount*1000}});
+
 
 const ProcessData = require('./model/process-data');
 
@@ -13,7 +14,7 @@ const port = config.Supervisor.port;
 const frontendPort = config.Frontend.port;
 
 const restart  = Boolean(process.argv[2]) || false;
-const supervisionTime = 2000
+const supervisionTime = 1000
 
 const UniqueIDGenerator = require('./helpers/uniqueID')
 const uniqueIDGenerator = new UniqueIDGenerator();
@@ -183,14 +184,6 @@ function keepAliveFrontend(){
     .catch( error =>{
         console.log(error.message);
         startFrontend(true);
-        initProcess(process)
-            .then(()=>{
-                res.send("Process listening on port "+ process.port);
-            })
-            .catch(error=> {
-                res.statusCode = 502;
-                res.send(error.message)
-            });
     });
 }
 

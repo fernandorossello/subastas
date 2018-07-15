@@ -2,11 +2,15 @@ const express = require('express');
 const axios = require('axios');
 const config = require('./config.json');
 const axiosRetry = require('axios-retry');
-axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 
 const Bid = require('./model/bid');
 const Offer = require('./model/offer');
 const ProcessData = require('./model/process-data');
+
+const http = axios.create();
+http.defaults.timeout = 2500;
+axiosRetry(http, { retries: 3, shouldResetTimeout:true, retryDelay: function (retryCount) {return retryCount*2000}});
+
 
 const app = express();
 
@@ -29,7 +33,7 @@ function init() {
 
 function loadProcessData() {
     console.log('Obtaining data after shutdown');
-    axios.get('http://localhost:'+ config.Supervisor.port+'/process')
+    http.get('http://localhost:'+ config.Supervisor.port+'/process')
         .then(res => {
             processes = res.data;
         });
@@ -37,7 +41,7 @@ function loadProcessData() {
 
 // Genera un post al proceso dado para cargar un comprador.
 function addBuyer(process,buyer){
-    return axios.post(process.getURL()+"/buyers",buyer);    
+    return http.post(process.getURL()+"/buyers",buyer);    
 }
 
 // Devuelve un proceso cualquiera de la lista de procesos levantados.
@@ -80,7 +84,7 @@ app.get('/process', (req, res) => {
 app.get('/ping-to-process', (req, res) => {
         const process = getProcessRandomly();
 
-        axios.get(process.getURL()+"/ping")
+        http.get(process.getURL()+"/ping")
         .then(response =>{
             res.status = response.status;
             res.send(response.data);
@@ -92,7 +96,7 @@ app.get('/ping-to-process', (req, res) => {
 });
 
 app.get('/status', (req, res) => {
-    const promises = processes.map( server => axios.get(server.getURL()+"/ping"));
+    const promises = processes.map( server => http.get(server.getURL()+"/ping"));
     Promise.all(promises).then(results => res.json(results.map(el => el.headers["x-server-name"]+':'+el.statusText)) );
 });
 
@@ -118,7 +122,7 @@ app.post('/bids',(req, res) => {
     var bidID = process.id +'-'+ uniqueIDGenerator.getUID();
     var bid = new Bid(bidID,req.body.tags,req.body.price,req.body.duration);
     
-    axios.post(process.getURL()+"/bids", bid)
+    http.post(process.getURL()+"/bids", bid)
         .then(response=>{
             res.send(response.data);
         })
@@ -131,11 +135,11 @@ app.post('/bids',(req, res) => {
 app.post('/offer',(req, res) => {
     var offer = Object.setPrototypeOf(req.body, Offer.prototype);
     var process = getProcessByID(offer.bidID.split('-')[0]);
-    axios.post(process.getURL()+'/offer',offer)
+    http.post(process.getURL()+'/offer',offer)
         .then(response =>{
             res.send(response.data);
         })
-        .catch(error =>{
+        .catch(error => {
             res.status = 502;
             res.send(error.message);
         });
@@ -148,7 +152,7 @@ app.post('/bids-cancel',(req, res) => {
         res.status = 502;
         res.send("No active bid for ID bidID");
     } else {
-        axios.post(process.getURL()+'/bids-cancel',req.body)
+        http.post(process.getURL()+'/bids-cancel',req.body)
             .then(response =>{
                 res.send(response.data);
             })

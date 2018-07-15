@@ -3,7 +3,8 @@ const app = express();
 
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
-axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
+axiosRetry(axios, { retries: 3, retryDelay: function (retryCount) {return retryCount*1000}});
+
 
 const Bid = require('./model/bid');
 const Buyer = require('./model/buyer')
@@ -140,6 +141,7 @@ app.post('/memory',(req,res) => {
   
   extMem.bids.forEach(b =>{
     var bid = Object.setPrototypeOf(b, Bid.prototype);
+    bid.extendTime();
     memory.addBid(bid);
   })
 
@@ -153,6 +155,8 @@ app.post('/memory',(req,res) => {
     memory.buyers.push(buyer);
   })
 
+  replicate();
+  
   res.send();
 });
 
@@ -167,7 +171,7 @@ app.post('/offer',(req,res) => {
   } else {
     offer.status = "rejected"
   }
-  res.send(JSON.stringify({offer:offer, bid:bid}))
+  res.send(JSON.stringify({offer:offer, bid:bid}));
 });
 
 app.post('/bids-cancel',(req, res) => {
