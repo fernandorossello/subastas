@@ -235,6 +235,24 @@ function loadProcessData(){
         });
 }
 
+function deleteProcess(port){
+    console.log("Deleting process on port "+port)
+    var index = processes.findIndex(p => p.port == port);
+    var process = processes[index];
+    axios.delete('http://127.0.0.1:'+frontendPort+'/process/'+process.id)
+        .then(()=> {
+            var process = processes[index];
+            processes.splice(index,1);
+            return axios.post(process.getURL()+'/kill');
+        })
+        .then(()=>{
+            axios.post(process.address+':'+process.replica+'/kill');
+        })
+        .catch(error => {
+            console.log(error.message);
+        });
+}
+
 init();
 
 //INTERFAZ
@@ -246,7 +264,7 @@ app.put('/process', (req, res) => {
         var process = new ProcessData(uniqueIDGenerator.getUID(),req.body.address,req.body.port);
         initProcess(process)
             .then(()=>{
-                res.send("Process listening on port "+ process.port);
+                res.send("Process online on port "+ process.port);
             })
             .catch(error=> {
                 res.statusCode = 500;
@@ -258,11 +276,9 @@ app.post('/process-bids',(req, res) => {
     var action = req.body.action;
     if(action == 'add'){
         maxPort = Math.max(...processes.map(p => p.port)) + 2;
-        console.log("Max port:" + maxPort)
         var process = new ProcessData(uniqueIDGenerator.getUID(),'http://127.0.0.1', maxPort);
         initProcess(process)
             .then(()=>{
-                console.log("Process listening on port "+ process.port)
                 res.send();
             })
             .catch(error=> {
@@ -270,7 +286,12 @@ app.post('/process-bids',(req, res) => {
                 res.send(error.message)
             });
     } else {
-        // TODO: Agregar lógica para 
+        if(processes.length > 1){
+            deleteProcess(req.body.port);
+        } else {
+            res.statusCode = 500;
+            res.send();
+        }
     }
 });
 

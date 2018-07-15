@@ -72,6 +72,17 @@ app.get('/process', (req, res) => {
     }
 });
 
+app.delete('/process/:pid', (req, res) => {
+    try {
+        var index = processes.findIndex(p => p.id == req.params.pid);
+        processes.splice(index,1);
+        res.send();
+    } catch(error) {
+        res.statusCode = 500;
+        res.send(error.message)
+    }
+});
+
 app.get('/status', (req, res) => {
     const promises = processes.map( server => http.get(server.getURL()+"/ping"));
     Promise.all(promises).then(results => res.json(results.map(el => el.headers["x-server-name"]+':'+el.statusText)) );

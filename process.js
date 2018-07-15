@@ -21,6 +21,7 @@ const Memory = require('./memory.js')
 var memory = new Memory();
 
 const maxBids = 3;
+var status = 'online';
 
 app.use(function(req, res, next) {
     res.set('X-Server-Name',"process_"+port);
@@ -61,6 +62,14 @@ function closeBid(bid,status){
           .catch(error => console.log(error.message));
       });
       replicate();
+      
+      if(memory.bids.length == 0){
+        setTimeout(function (){
+          if(memory.bids.length == 0){
+          shutdown();
+          }
+      },5000)
+      }
 }
 
 // Notifica a los compradores con tags en común, que hay una nueva subasta disponible.
@@ -104,11 +113,14 @@ function notifySupervisor(){
         console.log(error);
       });
   }
-  
-  if(amount == 0){
+}
 
-  }
-
+function shutdown() {
+  status = 'down';
+  axios.post('http://127.0.0.1:'+ config.Supervisor.port + '/process-bids',{action:'kill', port: port})
+      .catch(() => {
+        status = 'online';
+      });
 }
 
 init();
@@ -137,7 +149,7 @@ app.get('/buyers',(req, res) => {
 
 app.post('/bids',(req, res) => {
   try{
-    if (memory.bids.length < maxBids) {
+    if ( (status == 'online')  && (memory.bids.length < maxBids)) {
       var bid = Object.setPrototypeOf(req.body, Bid.prototype);
       memory.addBid(bid);
       notifySupervisor();
@@ -207,4 +219,10 @@ app.post('/bids-cancel',(req, res) => {
   } else {
     res.send('No active bid for ID ' + bidID);
   }
+});
+
+app.post('/kill',(req,res) => {
+  res.send();
+  console.log('Exiting process');
+  process.exit(1);
 });

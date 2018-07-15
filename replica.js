@@ -22,3 +22,9 @@ app.post('/memory',(req,res) => {
 app.get('/memory',(req, res) => {
     res.send(memory);
 });
+
+app.post('/kill',(req,res) => {
+    res.send();
+    console.log('Exiting replica');
+    process.exit(1);
+});
