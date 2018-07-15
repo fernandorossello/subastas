@@ -2,6 +2,7 @@ class Memory {
     constructor(address,port) {
         this.bids = [];
         this.closedBids = [];
+        this.buyers = [];
     }
 
     addBid(bid) {

@@ -49,9 +49,10 @@ function offer(bid) {
         newPrice = maxOffer+1;
         var uid = uniqueIDGenerator.getUID();
         var newOffer = new Offer(uid, buyer, bid.id, newPrice);
-        console.log("Offering "+ newPrice + ' ' + uid);
+    
         pendingOffers.push(newOffer);
         setTimeout(function (){
+            console.log("Offering "+ newPrice + ' ' + uid);
             axios.post(marketURL+'/offer',newOffer)
                 .then(res => {
                     // Si la oferta fue rechazada, vuelvo a ofertar recursivamente.
@@ -60,7 +61,7 @@ function offer(bid) {
                         var bidRes = Object.setPrototypeOf(res.data.bid, Bid.prototype);
                         if (offerRes.status == 'rejected'){
                             console.log("Offer rejected " + offerRes.price + ' ' +uid)
-                            removePendingOffer(bidRes)
+                            removePendingOffer(bidRes);
                             offer(bidRes);
                         } else {
                             console.log("Offer accepted " + offerRes.price + ' ' +uid)

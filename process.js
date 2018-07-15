@@ -18,8 +18,6 @@ app.use(express.urlencoded({ extended: true }));
 const Memory = require('./memory.js')
 var memory = new Memory();
 
-var buyers = [];
-
 app.use(function(req, res, next) {
     res.set('X-Server-Name',"process_"+port);
     next();
@@ -42,7 +40,7 @@ function checkExpiredBids(){
 
 function closeBid(bid,status){
     memory.closeBid(bid.id, status);
-    buyers
+    memory.buyers
       .filter(bu => bu.isInterested(bid.tags))
       .forEach(bu => {
         var message;
@@ -63,7 +61,7 @@ function closeBid(bid,status){
 
 // Notifica a los compradores con tags en común, que hay una nueva subasta disponible.
 function notifyNewBid(bid){
-  buyers
+  memory.buyers
     .filter(b => b.isInterested(bid.tags))
     .forEach(b => {
       axios.put(b.url()+'/bids',bid);
@@ -72,7 +70,7 @@ function notifyNewBid(bid){
 
 // Notifica a los compradores con tags en común, que hay una nueva oferta ganadora en una subasta.
 function notifyOthersInterested(bid){
-  buyers
+  memory.buyers
     .filter(b => b.isInterested(bid.tags) && b.name != bid.winningBuyer().name)
     .forEach(b => {
       axios.post(b.url()+'/bids',bid)
@@ -104,9 +102,10 @@ app.get('/ping', (req, res) => res.send('pong!'));
 app.post('/buyers',(req, res) => {
   try{
     buyer = Object.setPrototypeOf(req.body, Buyer.prototype);
-    buyers.push(buyer);
+    memory.buyers.push(buyer);
     res.send('Buyer created!')
     notifyActiveBids(buyer);
+    replicate();
   } catch(error) {
     res.status = 502;
     res.send(error.message);
@@ -114,7 +113,7 @@ app.post('/buyers',(req, res) => {
 });
 
 app.get('/buyers',(req, res) => {
-    res.send(buyers);
+    res.send(memory.buyers);
 });
 
 app.post('/bids',(req, res) => {
@@ -137,8 +136,23 @@ app.get('/memory',(req, res) => {
 });
 
 app.post('/memory',(req,res) => {
-  var mem = req.body;
-  memory = Object.setPrototypeOf(req.body, Memory.prototype);
+  var extMem = Object.setPrototypeOf(req.body, Memory.prototype);
+  
+  extMem.bids.forEach(b =>{
+    var bid = Object.setPrototypeOf(b, Bid.prototype);
+    memory.addBid(bid);
+  })
+
+  extMem.closedBids.forEach(b =>{
+    var bid = Object.setPrototypeOf(b, Bid.prototype);
+    memory.closedBids.push(bid);
+  })
+
+  extMem.buyers.forEach(b =>{
+    var buyer = Object.setPrototypeOf(b, Buyer.prototype);
+    memory.buyers.push(buyer);
+  })
+
   res.send();
 });
 
