@@ -6,9 +6,9 @@ const axiosRetry = require('axios-retry');
 axiosRetry(axios, { retries: 3, retryDelay: function () {return 500}});
 
 
-const ProcessData = require('./model/process-data');
+const ProcessData = require('../model/process-data');
 
-const config = require('./config.json');
+const config = require('../config.json');
 const app = express();
 const port = config.Supervisor.port;
 const frontendPort = config.Frontend.port;
@@ -16,7 +16,7 @@ const frontendPort = config.Frontend.port;
 const restart  = Boolean(process.argv[2]) || false;
 const supervisionTime = 1000
 
-const UniqueIDGenerator = require('./helpers/uniqueID')
+const UniqueIDGenerator = require('../helpers/uniqueID')
 const uniqueIDGenerator = new UniqueIDGenerator();
 
 var processes = [];
@@ -66,7 +66,7 @@ function notifyNewProcessToFrontend(process) {
 function startFrontend(){
     return new Promise(function(resolve, reject) { 
         try {                     
-            const child = exec('node frontend.js ' + frontendPort);
+            const child = exec('node ./architecture/frontend.js ' + frontendPort);
             
             child.stdout.on('data', (data) => {
                 console.log(`[frontend stdout]: ${data}`);
@@ -87,7 +87,7 @@ function startFrontend(){
 function startProcess(process) {
     return new Promise(function(resolve, reject) { 
         try{      
-            const child = exec('node process.js ' + process.port + ' ' + process.replica);
+            const child = exec('node ./architecture/process.js ' + process.port + ' ' + process.replica);
             child.stdout.on('data', (data) => {
                 console.log(`[process ${process.port} stdout]: ${data}`);
             });
@@ -108,7 +108,7 @@ function startProcess(process) {
 function startReplica(process){
     return new Promise(function(resolve, reject) { 
         try{
-            const child = exec('node replica.js ' + process.replica);
+            const child = exec('node ./architecture/replica.js ' + process.replica);
             child.stdout.on('data', (data) => {
                 console.log(`[replica ${process.replica} stdout]: ${data}`);
             });

@@ -5,11 +5,11 @@ const axios = require('axios');
 const axiosRetry = require('axios-retry');
 axiosRetry(axios, { retries: 3, retryDelay: function (retryCount) {return retryCount*1000}});
 
-const config = require('./config.json');
+const config = require('../config.json');
 
-const Bid = require('./model/bid');
-const Buyer = require('./model/buyer')
-const Offer = require('./model/offer')
+const Bid = require('../model/bid');
+const Buyer = require('../model/buyer')
+const Offer = require('../model/offer')
 
 const port = process.argv[2];
 const replicaPort = process.argv[3];
@@ -19,8 +19,6 @@ app.use(express.urlencoded({ extended: true }));
 
 const Memory = require('./memory.js')
 var memory = new Memory();
-
-var status = 'online';
 
 app.use(function(req, res, next) {
     res.set('X-Server-Name',"process_"+port);
@@ -148,7 +146,7 @@ app.get('/buyers',(req, res) => {
 
 app.post('/bids',(req, res) => {
   try{
-    if ( (status == 'online')  && (!memory.isFull()) ) {
+    if ( !memory.isFull() ) {
       var bid = Object.setPrototypeOf(req.body, Bid.prototype);
       memory.addBid(bid);
       notifySupervisor();

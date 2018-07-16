@@ -17,7 +17,7 @@ addBid() {
 }
 
 buyer3 () {
-	sleep 30
+	sleep 20
 	ttab -a Iterm "node ./buyers/buyer.js 5002 juguetes,futbol 600"
 }
 

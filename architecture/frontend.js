@@ -1,11 +1,11 @@
 const express = require('express');
 const axios = require('axios');
-const config = require('./config.json');
+const config = require('../config.json');
 const axiosRetry = require('axios-retry');
 
-const Bid = require('./model/bid');
-const Offer = require('./model/offer');
-const ProcessData = require('./model/process-data');
+const Bid = require('../model/bid');
+const Offer = require('../model/offer');
+const ProcessData = require('../model/process-data');
 
 const http = axios.create();
 http.interceptors.response.use(
@@ -24,7 +24,7 @@ const app = express();
 const port = process.argv[2];
 
 
-const UniqueIDGenerator = require('./helpers/uniqueID')
+const UniqueIDGenerator = require('../helpers/uniqueID')
 const uniqueIDGenerator = new UniqueIDGenerator();
 var processes = [];
 
