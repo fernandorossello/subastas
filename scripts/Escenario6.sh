@@ -12,7 +12,7 @@ buyer2 () {
 
 addBid() {
 	sleep 15
-	curl -X POST "http://127.0.0.1:4000/bids" -H "Content-Type: application/json" -d '{"tags":["juguetes","pokemon"], "price": 400, "duration": 120000,	"article":{"name":"Pikachu","size":"small"}}' 
+	curl -X POST "http://127.0.0.1:4000/bids" -H "Content-Type: application/json" -d '{"tags":["juguetes","pokemon"], "price": 400, "duration": 60000,	"article":{"name":"Pikachu","size":"small"}}' 
 	echo
 }
 
