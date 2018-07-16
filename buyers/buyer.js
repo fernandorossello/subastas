@@ -50,7 +50,7 @@ app.listen(port, () => console.log('Process online on port '+ port));
 function offer(bid) {   
     var maxOffer = bid.currentMaxOffer()
     if ( (bidIsActive(bid)) && (!hasPendingOffer(bid)) && (maxPrice > maxOffer)) {
-        newPrice = maxOffer+1;
+        var newPrice = maxOffer+1;
         var uid = uniqueIDGenerator.getUID();
         var newOffer = new Offer(uid, buyer, bid.id, newPrice);
         pendingOffers.push(newOffer);
