@@ -62,14 +62,6 @@ function closeBid(bid,status){
           .catch(error => console.log(error.message));
       });
       replicate();
-      
-      if(memory.bids.length == 0){
-        setTimeout(function (){
-          if(memory.bids.length == 0){
-          shutdown();
-          }
-      },5000)
-      }
 }
 
 // Notifica a los compradores con tags en común, que hay una nueva subasta disponible.
@@ -113,14 +105,6 @@ function notifySupervisor(){
         console.log(error);
       });
   }
-}
-
-function shutdown() {
-  status = 'down';
-  axios.post('http://127.0.0.1:'+ config.Supervisor.port + '/process-bids',{action:'kill', port: port})
-      .catch(() => {
-        status = 'online';
-      });
 }
 
 init();

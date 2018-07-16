@@ -273,26 +273,16 @@ app.put('/process', (req, res) => {
 });
 
 app.post('/process-bids',(req, res) => {
-    var action = req.body.action;
-    if(action == 'add'){
-        maxPort = Math.max(...processes.map(p => p.port)) + 2;
-        var process = new ProcessData(uniqueIDGenerator.getUID(),'http://127.0.0.1', maxPort);
-        initProcess(process)
-            .then(()=>{
-                res.send();
-            })
-            .catch(error=> {
-                res.statusCode = 500;
-                res.send(error.message)
-            });
-    } else {
-        if(processes.length > 1){
-            deleteProcess(req.body.port);
-        } else {
-            res.statusCode = 500;
+    maxPort = Math.max(...processes.map(p => p.port)) + 2;
+    var process = new ProcessData(uniqueIDGenerator.getUID(),'http://127.0.0.1', maxPort);
+    initProcess(process)
+        .then(()=>{
             res.send();
-        }
-    }
+        })
+        .catch(error=> {
+            res.statusCode = 500;
+            res.send(error.message)
+        });
 });
 
 
