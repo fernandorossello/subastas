@@ -165,3 +165,15 @@ app.post('/kill',(req,res) => {
     console.log('Exiting process');
     process.exit(1);
   });
+
+app.get('/bids/:bidID',(req,res) => {
+    var process = getProcessByID(req.params.bidID.split('-')[0]);
+    axios.get(process.getURL()+'/bids/'+req.params.bidID)
+        .then(response =>{
+            res.send(response.data);
+        })
+        .catch(error =>{
+            res.statusCode = error.status;
+            res.send(error.data);
+        });
+});

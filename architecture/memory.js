@@ -19,6 +19,14 @@ class Memory {
         return this.bids.find(b => b.id == id);
     }
 
+    getBidStatusById(id) {
+        var bid = this.bids.find(b => b.id == id);
+        if (bid == undefined){
+            bid = this.closedBids.find(b => b.id == id);
+        }
+        return bid;
+    }
+
     updateOffer(bid,offer){
         var index = this.bids.findIndex(b => b.id == bid.id);
         this.bids[index].maxOffer = offer;

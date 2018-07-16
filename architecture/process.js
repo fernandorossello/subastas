@@ -223,3 +223,15 @@ app.post('/kill',(req,res) => {
   console.log('Exiting process');
   process.exit(1);
 });
+
+app.get('/bids/:bidID',(req,res) => {
+  try{
+    var bid = memory.getBidStatusById(req.params.bidID);
+    res.send(bid);
+  } catch(error){
+    console.log(error);
+    res.statusCode = 500;
+    res.send(error.message);
+  }
+  
+});
