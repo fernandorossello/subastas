@@ -31,6 +31,9 @@ function initProcess(process){
                 startReplica(process);
             })
             .then(() => {
+                return setBuyersToProcess(process)
+            })
+            .then(() => {
                 notifyNewProcessToFrontend(process);
             })
             .then(() => {
@@ -40,6 +43,19 @@ function initProcess(process){
                 res.statusCode = 500;
                 res.send(error.message)
             });
+}
+
+function setBuyersToProcess(process){
+    if(processes.length > 0){
+        baseProcess = processes[0];
+        axios.get(baseProcess.getURL()+'/buyers')
+            .then(response =>{
+                return axios.put(process.getURL()+'/buyers',response.data);
+            })
+            .catch(error => {
+                throw error;
+            });
+    }
 }
 
 function notifyNewProcessToFrontend(process) {

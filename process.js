@@ -130,6 +130,21 @@ app.listen(port, () => console.log('Process online on port '+ port));
 //INTERFAZ
 app.get('/ping', (req, res) => res.send('pong!'));
 
+app.put('/buyers',(req, res) => {
+  try{
+    var buyers = req.body;
+    buyers.forEach(b =>{
+      buyer = Object.setPrototypeOf(b, Buyer.prototype);
+      memory.buyers.push(buyer);
+    })
+    res.send('Buyers setted!')
+    replicate();
+  } catch(error) {
+    res.statusCode = 500;
+    res.send(error.message);
+  }
+});
+
 app.post('/buyers',(req, res) => {
   try{
     buyer = Object.setPrototypeOf(req.body, Buyer.prototype);
