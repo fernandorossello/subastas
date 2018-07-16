@@ -151,7 +151,7 @@ function restartProcess(process){
         .then(() =>{
             return getMemory(process.address,process.replica)
         })
-        .then(() =>{
+        .then(res =>{
             setMemory(process.address,process.port,res.data);
         })
         .catch(error=> {
