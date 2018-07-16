@@ -161,7 +161,7 @@ app.post('/bids-cancel',(req, res) => {
 })
 
 app.post('/kill',(req,res) => {
-    res.send();
+    res.send('Bye bye');
     console.log('Exiting process');
     process.exit(1);
   });
