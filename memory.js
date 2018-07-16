@@ -1,7 +1,7 @@
 const maxBids = 3;
 
 class Memory {
-    constructor(address,port) {
+    constructor() {
         this.bids = [];
         this.closedBids = [];
         this.buyers = [];

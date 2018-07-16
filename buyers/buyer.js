@@ -15,10 +15,13 @@ const Offer = require('../model/offer')
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-marketURL = 'http://127.0.0.1:'+config.Frontend.port;
+
 const port = process.argv[2];
 const tags = process.argv[3].split(',')
 const maxPrice = process.argv[4]
+const buyerHostname = process.argv[5] || '127.0.0.1'
+
+marketURL = 'http://127.0.0.1:'+config.Frontend.port;
 
 const bids = []
 const pendingOffers = []
@@ -30,7 +33,7 @@ function init() {
 }
 
 function suscribe() {
-    buyer = new Buyer(port,'http://127.0.0.1',port,tags);
+    buyer = new Buyer(port,'http://'+buyerHostname,port,tags);
     axios.post(marketURL +'/buyers',buyer)
         .then(res => {
             console.log(res.data);
