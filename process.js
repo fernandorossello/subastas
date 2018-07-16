@@ -20,7 +20,6 @@ app.use(express.urlencoded({ extended: true }));
 const Memory = require('./memory.js')
 var memory = new Memory();
 
-const maxBids = 3;
 var status = 'online';
 
 app.use(function(req, res, next) {
@@ -85,6 +84,7 @@ function notifyOthersInterested(bid){
     })
 };
 
+// Notifica a un usuario entrante las subastas previas en las que podría estar interesado.
 function notifyActiveBids(buyer){
   memory.bids
     .filter(bid => buyer.isInterested(bid.tags))
@@ -96,10 +96,10 @@ function notifyActiveBids(buyer){
 function init(){
     setTimeout(checkExpiredBids,500);
 }
+
 // Notifica al supervisor si llegó al máximo de subastas posibles o si está sin trabajo.
 function notifySupervisor(){
-  var amount = memory.bids.length;
-  if (amount >= maxBids) {
+  if (memory.isFull()) {
     axios.post('http://127.0.0.1:'+ config.Supervisor.port + '/process-bids',{action:'add'})
       .catch(error => {
         console.log(error);
@@ -148,7 +148,7 @@ app.get('/buyers',(req, res) => {
 
 app.post('/bids',(req, res) => {
   try{
-    if ( (status == 'online')  && (memory.bids.length < maxBids)) {
+    if ( (status == 'online')  && (!memory.isFull()) ) {
       var bid = Object.setPrototypeOf(req.body, Bid.prototype);
       memory.addBid(bid);
       notifySupervisor();

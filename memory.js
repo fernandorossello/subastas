@@ -1,8 +1,14 @@
+const maxBids = 3;
+
 class Memory {
     constructor(address,port) {
         this.bids = [];
         this.closedBids = [];
         this.buyers = [];
+    }
+
+    isFull(){
+        return (this.bids.length + this.closedBids.length) >= maxBids;
     }
 
     addBid(bid) {
