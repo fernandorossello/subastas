@@ -23,6 +23,7 @@ const maxPrice = process.argv[4]
 const bids = []
 const pendingOffers = []
 var buyer;
+const offeringDelay = 5000;
 
 function init() {
     suscribe();
@@ -51,27 +52,29 @@ function offer(bid) {
         var newOffer = new Offer(uid, buyer, bid.id, newPrice);
         pendingOffers.push(newOffer);
         setTimeout(function (){
-            console.log("Offering "+ newPrice + ' ' + uid);
-            axios.post(marketURL+'/offer',newOffer)
-                .then(res => {
-                    // Si la oferta fue rechazada, vuelvo a ofertar recursivamente.
-                    var offerRes = res.data.offer;
-                    if(res.data.bid != undefined){
-                        var bidRes = Object.setPrototypeOf(res.data.bid, Bid.prototype);
-                        if (offerRes.status == 'rejected'){
-                            console.log("Offer rejected " + offerRes.price + ' ' +uid)
-                            removePendingOffer(bidRes);
-                            offer(bidRes);
-                        } else {
-                            console.log("Offer accepted " + offerRes.price + ' ' +uid)
-                            removePendingOffer(bidRes);
+            if(bidIsActive(bid)){
+                console.log("\nOffering "+ newPrice + '. Bid: ' +bid.id);
+                axios.post(marketURL+'/offer',newOffer)
+                    .then(res => {
+                        // Si la oferta fue rechazada, vuelvo a ofertar recursivamente.
+                        var offerRes = res.data.offer;
+                        if(res.data.bid != undefined){
+                            var bidRes = Object.setPrototypeOf(res.data.bid, Bid.prototype);
+                            if (offerRes.status == 'rejected'){
+                                console.log("Offer rejected " + offerRes.price + '. Bid: ' +bid.id)
+                                removePendingOffer(bidRes);
+                                offer(bidRes);
+                            } else {
+                                console.log("Offer accepted " + offerRes.price + '. Bid: ' +bid.id)
+                                removePendingOffer(bidRes);
+                            }
                         }
-                    }
-                })
-                .catch(error => {
-                    console.log(error.message);
-                })
-            },2000);
+                    })
+                    .catch(error => {
+                        console.log(error.message);
+                    })
+            }
+        },offeringDelay);
     }
 }
 
@@ -116,9 +119,11 @@ app.put('/bids', (req, res) => {
 app.post('/bids', (req, res) => {
     try{ 
         var bid = Object.setPrototypeOf(req.body, Bid.prototype);
-        console.log("Bid changed. New best price:", bid.currentMaxOffer());
         res.send();
-        offer(bid);
+        if((bidIsActive(bid)) && (!hasPendingOffer(bid))){
+            console.log("\nBid changed "+bid.id+". New best price: "+ bid.currentMaxOffer());
+            offer(bid);
+        }
     } catch(error) {
         res.status = 500;
         res.send(error.message);
@@ -131,10 +136,16 @@ app.post('/bids-close', (req, res) => {
         var bid = Object.setPrototypeOf(req.body.bid, Bid.prototype);
         var message = req.body.message;
         removeBid(bid);
-        console.log( message + ' Bid:' + bid.id);
+        console.log("\n" + message + ' Bid:' + bid.id);
         res.send();
     } catch(error) {
         res.status = 500;
         res.send(error.message);
     }
 });
+
+app.post('/kill',(req,res) => {
+    res.send('Bye bye');
+    console.log('Exiting process');
+    process.exit(1);
+  });
