@@ -20,10 +20,9 @@ http.interceptors.response.use(
 http.defaults.timeout = 2500;
 axiosRetry(http, { retries: 3, shouldResetTimeout:true, retryDelay: function (retryCount) {return retryCount*2000}});
 
-
 const app = express();
-
 const port = process.argv[2];
+
 
 const UniqueIDGenerator = require('./helpers/uniqueID')
 const uniqueIDGenerator = new UniqueIDGenerator();
@@ -70,11 +69,6 @@ app.get('/process', (req, res) => {
         res.statusCode = 500;
         res.send(error.data)
     }
-});
-
-app.get('/status', (req, res) => {
-    const promises = processes.map( server => http.get(server.getURL()+"/ping"));
-    Promise.all(promises).then(results => res.json(results.map(el => el.headers["x-server-name"]+':'+el.statusText)) );
 });
 
 app.post('/buyers',(req, res) => {
@@ -132,14 +126,20 @@ function distributeBid(bid) {
 app.post('/offer',(req, res) => {
     var offer = Object.setPrototypeOf(req.body, Offer.prototype);
     var process = getProcessByID(offer.bidID.split('-')[0]);
-    http.post(process.getURL()+'/offer',offer)
-        .then(response =>{
-            res.send(response.data);
-        })
-        .catch(error => {
-            res.statusCode = 500;
-            res.send(error.data);
-        });
+    // En caso de que el frontend se haya caído y no tenga los procesos cargados todavía
+    if (process == undefined){
+        res.statusCode = 500;
+        res.send("No active bid for ID bidID");
+    } else {
+        http.post(process.getURL()+'/offer',offer)
+            .then(response =>{
+                res.send(response.data);
+            })
+            .catch(error => {
+                res.statusCode = 500;
+                res.send(error.data);
+            });
+    } 
 });
 
 app.post('/bids-cancel',(req, res) => {
