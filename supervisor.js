@@ -301,4 +301,8 @@ app.post('/process-bids',(req, res) => {
         });
 });
 
-
+app.post('/kill',(req,res) => {
+    res.send();
+    console.log('Exiting process');
+    process.exit(1);
+  });
