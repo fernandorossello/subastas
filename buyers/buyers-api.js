@@ -127,7 +127,7 @@ app.get('/buyers',(req,res) => {
 
   function offer(bid,buyer) {   
     var maxOffer = bid.currentMaxOffer()
-    if ( (bidIsActive(bid,buyer)) && (!hasPendingOffer(bid,buyer)) && (buyer.strategy.maxPrice > maxOffer)) {
+    if ( (bidIsActive(bid,buyer)) && (!hasPendingOffer(bid,buyer)) && (buyer.strategy.maxPrice > maxOffer) && ( buyer.strategy.ratioOffering >= Math.floor(100 * Math.random())+1 )) {
         newPrice = maxOffer+buyer.strategy.increment;
         var uid = uniqueIDGenerator.getUID();
         let buyerCloned = Object.assign({}, buyer);

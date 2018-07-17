@@ -6,7 +6,8 @@
   "scripts": {
     "test": "test",
     "start": "node ./architecture/supervisor.js",
-    "restart":"node ./architecture/supervisor.js true"
+    "restart":"node ./architecture/supervisor.js true",
+    "start-buyers": "node ./buyers/buyers-api.js 4005"
   },
   "repository": {
     "type": "git",

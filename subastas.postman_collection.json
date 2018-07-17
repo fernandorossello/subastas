@@ -1,0 +1,1415 @@
+{
+	"info": {
+		"_postman_id": "2506a82a-56a7-4141-8513-7b668270954b",
+		"name": "subastas copy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "market",
+			"description": null,
+			"item": [
+				{
+					"name": "workflow1",
+					"description": null,
+					"item": [
+						{
+							"name": "register buyer A",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/x-www-form-urlencoded"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "name",
+											"value": "Buyer A",
+											"type": "text"
+										},
+										{
+											"key": "ip",
+											"value": "http://5.0.2.120:3010/inbox",
+											"type": "text"
+										},
+										{
+											"key": "tags",
+											"value": "autos,bicicletas,ropa",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "127.0.0.1:3000/buyers",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "3000",
+									"path": [
+										"buyers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "register buyer B",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/x-www-form-urlencoded"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "name",
+											"value": "Buyer B",
+											"type": "text"
+										},
+										{
+											"key": "ip",
+											"value": "http://5.0.2.120:3020/inbox",
+											"type": "text"
+										},
+										{
+											"key": "tags",
+											"value": "ropa,electrodomestico",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "127.0.0.1:3000/buyers",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "3000",
+									"path": [
+										"buyers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "register buyer C",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/x-www-form-urlencoded"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "name",
+											"value": "Buyer C",
+											"type": "text"
+										},
+										{
+											"key": "ip",
+											"value": "http://5.0.2.120:3030/inbox",
+											"type": "text"
+										},
+										{
+											"key": "tags",
+											"value": "editors,ides,ropa",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "127.0.0.1:3000/buyers",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "3000",
+									"path": [
+										"buyers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "crear subasta",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/x-www-form-urlencoded"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "tags",
+											"value": "ropa,celulares",
+											"type": "text"
+										},
+										{
+											"key": "precio_base",
+											"value": "7",
+											"type": "text"
+										},
+										{
+											"key": "item",
+											"value": "{nombre:\"dasd\",descripcion:\"asdasd\"}",
+											"description": "\n",
+											"type": "text"
+										},
+										{
+											"key": "finaliza_en",
+											"value": "60",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "127.0.0.1:3000/bids",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "3000",
+									"path": [
+										"bids"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "buyer A make a offer",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/x-www-form-urlencoded"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "buyer_name",
+											"value": "Buyer A",
+											"type": "text"
+										},
+										{
+											"key": "bid_id",
+											"value": "9cd8219d-6167-4540-a014-186028b02c9c",
+											"type": "text"
+										},
+										{
+											"key": "price",
+											"value": "19",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "127.0.0.1:3000/make_a_offer",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "3000",
+									"path": [
+										"make_a_offer"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "helpers",
+					"description": null,
+					"item": [
+						{
+							"name": "list - buyers",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/x-www-form-urlencoded"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "buyer A",
+											"type": "text"
+										},
+										{
+											"key": "ip",
+											"value": "127.0.0.1:3010",
+											"type": "text"
+										},
+										{
+											"key": "tags",
+											"value": "'autos',  'bicicletas'",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "127.0.0.1:3000/list/buyers",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "3000",
+									"path": [
+										"list",
+										"buyers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "list - bids",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/x-www-form-urlencoded"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "buyer A",
+											"type": "text"
+										},
+										{
+											"key": "ip",
+											"value": "127.0.0.1:3010",
+											"type": "text"
+										},
+										{
+											"key": "tags",
+											"value": "'autos',  'bicicletas'",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "127.0.0.1:3000/list/bids",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "3000",
+									"path": [
+										"list",
+										"bids"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "clear_all",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/x-www-form-urlencoded"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "127.0.0.1:3000/clear_all",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "3000",
+									"path": [
+										"clear_all"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				}
+			]
+		},
+		{
+			"name": "buyer_client",
+			"description": null,
+			"item": [
+				{
+					"name": "avisar oferta",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "bid_id",
+									"value": "asddas",
+									"type": "text"
+								},
+								{
+									"key": "op",
+									"value": "new_price",
+									"type": "text"
+								},
+								{
+									"key": "value",
+									"value": "123",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "127.0.0.1:3010/inbox",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3010",
+							"path": [
+								"inbox"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "version2",
+			"description": null,
+			"item": [
+				{
+					"name": "frontend",
+					"description": null,
+					"item": [
+						{
+							"name": "frontend ping",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "127.0.0.1:4000/ping",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "4000",
+									"path": [
+										"ping"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "list process",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "127.0.0.1:4000/process",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "4000",
+									"path": [
+										"process"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "add process",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "   {\n        \"id\": \"uau32\",\n        \"address\": \"http://127.0.0.1\",\n        \"port\": 6006,\n        \"replica\": 6007\n    }"
+								},
+								"url": {
+									"raw": "127.0.0.1:4000/process",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "4000",
+									"path": [
+										"process"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "add process Copy",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/x-www-form-urlencoded"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "127.0.0.1:4000/process/uau33",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "4000",
+									"path": [
+										"process",
+										"uau33"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "status",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "127.0.0.1:4000/status",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "4000",
+									"path": [
+										"status"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add buyer",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\"name\":\"Buyer25\",\n\"address\": \"http://127.0.0.1\",\n\"port\": 4002,\n \"tags\": [\n        \"juguetes\",\n        \"autos\"\n    ]\n}"
+								},
+								"url": {
+									"raw": "localhost:4000/buyers",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										"buyers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "New Bid",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"tags\":[\"juguetes\",\"pokemon\"],\n\t\"price\": 500,\n\t\"duration\": 50000,\n\t\"article\":{\"name\":\"Pikachu\",\"size\":\"small\"}\n}"
+								},
+								"url": {
+									"raw": "localhost:4000/bids",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										"bids"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "new offer",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"bidID\": \"137u-kti5\",\n\t\"buyer\":\"Buyer25\",\n\t\"price\": 580\n}"
+								},
+								"url": {
+									"raw": "localhost:4000/offer",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										"offer"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Cancel bid",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"bidID\": \"fag3e33-qygp\"\n}"
+								},
+								"url": {
+									"raw": "localhost:4000/bids-cancel",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										"bids-cancel"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Kill",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"bidID\": \"fag3e33-qygp\"\n}"
+								},
+								"url": {
+									"raw": "localhost:4000/kill",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										"kill"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "supervisor",
+					"description": null,
+					"item": [
+						{
+							"name": "sv process-list",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "127.0.0.1:3000/process-list",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "3000",
+									"path": [
+										"process-list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "supervisor ping",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "127.0.0.1:3000/ping",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "3000",
+									"path": [
+										"ping"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "process fe Copy",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/x-www-form-urlencoded"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "port",
+											"value": "5000",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "127.0.0.1:3000/process",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "3000",
+									"path": [
+										"process"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Kill Copy",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"bidID\": \"fag3e33-qygp\"\n}"
+								},
+								"url": {
+									"raw": "localhost:3000/kill",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"kill"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "process",
+					"description": null,
+					"item": [
+						{
+							"name": "supervisor ping Copy",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "127.0.0.1:3001/ping",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "3001",
+									"path": [
+										"ping"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "buyers",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "127.0.0.1:3001/buyers",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "3001",
+									"path": [
+										"buyers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add buyer",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\"name\":\"Buyer25\",\n\"address\": \"http://127.0.0.1\",\n\"port\": 4002,\n \"tags\": [\n        \"juguetes\",\n        \"autos\"\n    ]\n}"
+								},
+								"url": {
+									"raw": "localhost:3001/buyers",
+									"host": [
+										"localhost"
+									],
+									"port": "3001",
+									"path": [
+										"buyers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "New Bid",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"id\": \"asdasd\",\n\t\"tags\":[\"juguetes\",\"pokemon\"],\n\t\"price\": 500,\n\t\"duration\": 50000,\n\t\"article\":{\"name\":\"Pikachu\",\"size\":\"small\"}\n}"
+								},
+								"url": {
+									"raw": "localhost:3001/bids",
+									"host": [
+										"localhost"
+									],
+									"port": "3001",
+									"path": [
+										"bids"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "memory",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "localhost:3001/memory",
+									"host": [
+										"localhost"
+									],
+									"port": "3001",
+									"path": [
+										"memory"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "memory",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "localhost:3005/memory",
+									"host": [
+										"localhost"
+									],
+									"port": "3005",
+									"path": [
+										"memory"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "new offer Copy",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"bidID\": \"ggc5-92df\",\n\t\"buyer\":\"Buyer25\",\n\t\"price\": 508\n}"
+								},
+								"url": {
+									"raw": "localhost:3001/offer",
+									"host": [
+										"localhost"
+									],
+									"port": "3001",
+									"path": [
+										"offer"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Cancel bid Copy",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"bidID\": \"hb63-76qq\"\n}"
+								},
+								"url": {
+									"raw": "localhost:4000/bids-cancel",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										"bids-cancel"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "workflow1",
+					"description": null,
+					"item": [
+						{
+							"name": "register process1",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/x-www-form-urlencoded"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "port",
+											"value": "3004",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "127.0.0.1:3000/process",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "3000",
+									"path": [
+										"process"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "register process2",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/x-www-form-urlencoded"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "port",
+											"value": "3006",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "127.0.0.1:3000/process",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "3000",
+									"path": [
+										"process"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "register process3",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/x-www-form-urlencoded"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "port",
+											"value": "3008",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "127.0.0.1:3000/process",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "3000",
+									"path": [
+										"process"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "random ping via frontend",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "127.0.0.1:4000/ping-to-process",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "4000",
+									"path": [
+										"ping-to-process"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "status",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "127.0.0.1:4000/status",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "4000",
+									"path": [
+										"status"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "buyer",
+					"description": null,
+					"item": [
+						{
+							"name": "grupo1",
+							"description": "",
+							"item": [
+								{
+									"name": "add buyer 1",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\"name\":\"Buyer1\",\n\"strategy\":{\"maxPrice\":550,\"wait\":1000,\"increment\":1,\"ratioOffering\":100},\n\"address\": \"http://10.0.2.15\",\n\"port\": 5050,\n \"tags\": [\n        \"juguetes\",\n        \"autos\"\n    ]\n}"
+										},
+										"url": {
+											"raw": "127.0.0.1:4005/buyer",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "4005",
+											"path": [
+												"buyer"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "add buyer 2",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\"name\":\"Buyer2\",\n\"strategy\":{\"maxPrice\":550,\"wait\":1000,\"increment\":1,\"ratioOffering\":100},\n\"address\": \"http://10.0.2.15\",\n\"port\": 5052,\n \"tags\": [\n        \"juguetes\",\n        \"autos\"\n    ]\n}"
+										},
+										"url": {
+											"raw": "127.0.0.1:4005/buyer",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "4005",
+											"path": [
+												"buyer"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "grupo2",
+							"description": "",
+							"item": [
+								{
+									"name": "add buyer 1",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\"name\":\"Buyer1\",\n\"strategy\":{\"maxPrice\":550,\"wait\":2000,\"increment\":1,\"ratioOffering\":100},\n\"address\": \"http://host.docker.internal\",\n\"port\": 5150,\n \"tags\": [\n        \"juguetes\",\n        \"autos\"\n    ]\n}"
+										},
+										"url": {
+											"raw": "127.0.0.1:4005/buyer",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "4005",
+											"path": [
+												"buyer"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "add buyer 2",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\"name\":\"Buyer2\",\n\"strategy\":{\"maxPrice\":550,\"wait\":2000,\"increment\":1,\"ratioOffering\":100},\n\"address\": \"http://host.docker.internal\",\n\"port\": 5152,\n \"tags\": [\n        \"juguetes\",\n        \"autos\"\n    ]\n}"
+										},
+										"url": {
+											"raw": "127.0.0.1:4005/buyer",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "4005",
+											"path": [
+												"buyer"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "add buyer 3",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\"name\":\"Buyer3\",\n\"strategy\":{\"maxPrice\":550,\"wait\":5000,\"increment\":10,\"ratioOffering\":50},\n\"address\": \"http://host.docker.internal\",\n\"port\": 5153,\n \"tags\": [\n        \"juguetes\",\n        \"autos\"\n    ]\n}"
+										},
+										"url": {
+											"raw": "127.0.0.1:4005/buyer",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "4005",
+											"path": [
+												"buyer"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "buyers",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "127.0.0.1:4005/buyers",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "4005",
+									"path": [
+										"buyers"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				}
+			]
+		}
+	]
+}
