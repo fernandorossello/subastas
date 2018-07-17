@@ -45,7 +45,7 @@ function suscribe() {
 
 init();
 
-app.listen(port, () => console.log('Process online on port '+ port));
+app.listen(port, () => console.log('Buyer online on port '+ port));
 
 function offer(bid) {   
     var maxOffer = bid.currentMaxOffer()
@@ -149,6 +149,6 @@ app.post('/bids-close', (req, res) => {
 
 app.post('/kill',(req,res) => {
     res.send('Bye bye');
-    console.log('Exiting process');
+    console.log('Exiting buyer');
     process.exit(1);
   });
