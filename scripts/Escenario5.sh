@@ -2,12 +2,12 @@
 
 buyer1 () {
 	sleep 1
-	ttab -a Iterm "node ./buyers/buyer.js 5000 juguetes,autos 508"
+	node ./buyers/buyer.js 5000 juguetes,autos 508 &
 }
 
 buyer2 () {
 	sleep 2
-	ttab -a Iterm "node ./buyers/buyer.js 5001 juguetes,futbol 503"
+	node ./buyers/buyer.js 5001 juguetes,futbol 503 &
 }
 
 addBids() {

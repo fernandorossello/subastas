@@ -1,13 +1,13 @@
 #!/bin/bash
 
 buyer1 () {
-	sleep 1
-	ttab -a Iterm "node ./buyers/buyer.js 5000 juguetes,autos 508"
+	sleep 5
+	node ./buyers/buyer.js 5008 juguetes,autos 508 &
 }
 
 buyer2 () {
-	sleep 2
-	ttab -a Iterm "node ./buyers/buyer.js 5001 juguetes,futbol 503"
+	sleep 5
+	node ./buyers/buyer.js 5009 juguetes,futbol 503 &
 }
 
 addBids() {
